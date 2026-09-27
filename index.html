@@ -355,7 +355,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     out.push(line); return out;
   }
   function layout(ctx, s, when){
-    const W = 250*s, P = 11*s, inner = W-2*P;
+    const W = 300*s, P = 11*s, inner = W-2*P;
     ctx.font = `700 ${15*s}px ${FONT}`;
     const site = S.site.trim();
     const head = (S.show.site && site) ? wrap(ctx, site, inner) : [];
@@ -391,7 +391,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     if(bodyH){ ctx.fillStyle = 'rgba(18,18,18,0.66)'; ctx.fillRect(0,headH,W,bodyH); }
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#111'; ctx.font = `700 ${15*s}px ${FONT}`;
-    head.forEach((t,i)=>ctx.fillText(t, P, 7*s + headLH*(i+.5)));
+    ctx.textAlign = 'center';
+    head.forEach((t,i)=>ctx.fillText(t, W/2, 7*s + headLH*(i+.5)));
+    ctx.textAlign = 'left';
     ctx.fillStyle = '#fff'; ctx.font = `400 ${14*s}px ${FONT}`;
     const {labelW, colonW} = L;
     rows.forEach((row,i)=>{
