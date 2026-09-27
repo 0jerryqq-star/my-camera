@@ -4,93 +4,106 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>工地相機</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+<link rel="apple-touch-icon" id="touchIcon" href="data:image/png;base64,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">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="工地相機">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
-  --cam-bg:#000;
-  --chrome:#141414;
-  --chrome-text:#f2f2f2;
   --safety:#F5B800;
-  --sheet-bg:#ffffff;
-  --sheet-text:#1d1d1d;
-  --sheet-muted:#6b6b6b;
-  --field-bg:#f1f1ef;
-  --field-border:#dcdcd8;
+  --chrome-text:#f4f4f4;
+  --sheet-bg:#ffffff; --sheet-text:#1d1d1d; --sheet-muted:#6b6b6b;
+  --field-bg:#f1f1ef; --field-border:#dcdcd8;
   --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+  --st:env(safe-area-inset-top,0px); --sb:env(safe-area-inset-bottom,0px);
+  --sl:env(safe-area-inset-left,0px); --sr:env(safe-area-inset-right,0px);
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --sheet-bg:#1e1e1e; --sheet-text:#eeeeee; --sheet-muted:#a0a0a0;
-    --field-bg:#2a2a2a; --field-border:#3a3a3a;
-  }
+  :root:not([data-theme="light"]){--sheet-bg:#1e1e1e;--sheet-text:#eee;--sheet-muted:#a0a0a0;--field-bg:#2a2a2a;--field-border:#3a3a3a}
 }
-:root[data-theme="dark"]{
-  --sheet-bg:#1e1e1e; --sheet-text:#eeeeee; --sheet-muted:#a0a0a0;
-  --field-bg:#2a2a2a; --field-border:#3a3a3a;
-}
-*,*::before,*::after{box-sizing:inherit}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
-body{height:100%;margin:0;background:var(--cam-bg);color:var(--chrome-text);font-family:var(--font);overflow:hidden;-webkit-tap-highlight-color:transparent}
+:root[data-theme="dark"]{--sheet-bg:#1e1e1e;--sheet-text:#eee;--sheet-muted:#a0a0a0;--field-bg:#2a2a2a;--field-border:#3a3a3a}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#000;color:var(--chrome-text);font-family:var(--font);overflow:hidden;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button{font-family:inherit}
-button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid var(--safety);outline-offset:2px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline-offset:2px}
 
-.app{height:100%;display:flex;flex-direction:column}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--chrome)}
-.topbar h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.02em}
-.icon-btn{background:transparent;border:0;color:var(--chrome-text);font-size:15px;padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px}
-.icon-btn:active{background:#2a2a2a}
-.icon-btn svg{width:22px;height:22px}
-
-.viewport{position:relative;flex:1;overflow:hidden;background:#000;touch-action:none}
+/* full-bleed camera: fills the whole screen in any orientation */
+.viewport{position:fixed;inset:0;overflow:hidden;background:#000;touch-action:none}
 .viewport video,.viewport img.src{position:absolute;inset:0;width:100%;height:100%}
 .viewport video{object-fit:cover}
 .viewport img.src{object-fit:contain}
-#wm{position:absolute;left:0;top:0;cursor:grab;touch-action:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
+#wm{position:absolute;left:0;top:0;cursor:grab;touch-action:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));z-index:2}
 #wm.dragging{cursor:grabbing;outline:2px dashed var(--safety);outline-offset:3px}
 #wm[hidden]{display:none}
-.hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:6px 12px;border-radius:999px;font-size:13px;white-space:nowrap;pointer-events:none;transition:opacity .4s}
-.fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
-.fallback p{margin:0;max-width:32ch;line-height:1.6;color:#cfcfcf;font-size:15px}
-.fallback[hidden]{display:none}
-.big-btn{background:var(--safety);color:#111;border:0;border-radius:12px;padding:14px 22px;font-size:16px;font-weight:700;cursor:pointer}
-.ghost-btn{background:transparent;color:var(--chrome-text);border:1px solid #555;border-radius:12px;padding:12px 20px;font-size:15px;cursor:pointer}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:5}
+.flash.go{animation:flash .25s ease-out}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
 
-.bottombar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 18px 18px;background:var(--chrome)}
-.wm-toggle{justify-self:start;display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none}
+/* overlaid controls — portrait */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--st) + 6px) calc(var(--sr) + 10px) 18px calc(var(--sl) + 10px);
+  background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0));pointer-events:none}
+.topbar > *{pointer-events:auto}
+.topbar h1{margin:0;font-size:16px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.icon-btn{background:rgba(0,0,0,.35);border:0;color:var(--chrome-text);font-size:14px;padding:8px 12px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.icon-btn svg{width:22px;height:22px}
+.bottombar{position:fixed;left:0;right:0;bottom:0;z-index:3;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  padding:26px calc(var(--sr) + 18px) calc(var(--sb) + 18px) calc(var(--sl) + 18px);
+  background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.6))}
+.wm-toggle{justify-self:start;display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 .wm-toggle input{position:absolute;opacity:0;width:1px;height:1px}
-.switch{width:46px;height:28px;border-radius:14px;background:#444;position:relative;transition:background .2s}
+.switch{flex:none;width:46px;height:28px;border-radius:14px;background:rgba(80,80,80,.9);position:relative;transition:background .2s}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s}
 .wm-toggle input:checked + .switch{background:var(--safety)}
 .wm-toggle input:checked + .switch::after{transform:translateX(18px)}
-.shutter{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:transparent;padding:4px;cursor:pointer}
+.wm-toggle input:focus-visible + .switch{outline:2px solid #fff;outline-offset:2px}
+.shutter{width:76px;height:76px;border-radius:50%;border:4px solid #fff;background:transparent;padding:4px;cursor:pointer}
 .shutter span{display:block;width:100%;height:100%;border-radius:50%;background:#fff;transition:transform .1s}
 .shutter:active span{transform:scale(.88)}
 .shutter:disabled{opacity:.35}
 .thumb{justify-self:end;width:52px;height:52px;border-radius:10px;border:2px solid #fff;background:#222 center/cover no-repeat;cursor:pointer;padding:0}
-.thumb:empty{visibility:hidden}
-.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-.flash.go{animation:flash .25s ease-out}
-@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+.thumb.empty{visibility:hidden}
+
+/* landscape: controls move to the sides, camera keeps the full screen */
+@media (orientation: landscape) and (max-height: 560px){
+  .topbar{top:0;bottom:0;right:auto;flex-direction:column;justify-content:space-between;align-items:flex-start;
+    padding:calc(var(--st) + 12px) 24px calc(var(--sb) + 12px) calc(var(--sl) + 10px);
+    background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,0))}
+  .topbar h1{display:none}
+  .bottombar{left:auto;top:0;grid-template-columns:none;grid-template-rows:1fr auto 1fr;justify-items:center;
+    padding:calc(var(--st) + 14px) calc(var(--sr) + 16px) calc(var(--sb) + 14px) 26px;
+    background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.5))}
+  .wm-toggle{justify-self:center;align-self:start;flex-direction:column;gap:6px;font-size:12px}
+  .thumb{justify-self:center;align-self:end}
+}
+
+.hint,.toast{position:fixed;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:7px 14px;border-radius:999px;font-size:13px;white-space:nowrap;pointer-events:none;transition:opacity .4s;z-index:4;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.hint{top:calc(var(--st) + 60px)}
+.toast{top:calc(var(--st) + 60px);opacity:0}
+.toast.show{opacity:1}
+.fallback{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.fallback p{margin:0;max-width:32ch;line-height:1.6;color:#cfcfcf;font-size:15px}
+.fallback[hidden]{display:none}
+.big-btn{background:var(--safety);color:#111;border:0;border-radius:12px;padding:14px 22px;font-size:16px;font-weight:700;cursor:pointer}
+.ghost-btn{background:transparent;color:var(--chrome-text);border:1px solid #666;border-radius:12px;padding:12px 20px;font-size:15px;cursor:pointer}
 
 /* settings sheet */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
 .scrim.open{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88%;background:var(--sheet-bg);color:var(--sheet-text);border-radius:18px 18px 0 0;z-index:11;transform:translateY(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);max-width:640px;margin:0 auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88%;background:var(--sheet-bg);color:var(--sheet-text);border-radius:18px 18px 0 0;z-index:11;transform:translateY(105%);transition:transform .25s ease;display:flex;flex-direction:column;padding:0 var(--sr) var(--sb) var(--sl);max-width:640px;margin:0 auto}
 .sheet.open{transform:none}
 .sheet header{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 8px}
 .sheet h2{margin:0;font-size:18px}
 .sheet .done{background:var(--safety);color:#111;border:0;border-radius:10px;padding:8px 16px;font-weight:700;font-size:15px;cursor:pointer}
-.sheet .body{overflow-y:auto;padding:4px 18px 22px}
+.sheet .body{overflow-y:auto;padding:4px 18px 22px;-webkit-overflow-scrolling:touch}
 .row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--field-border)}
-.row:last-child{border-bottom:0}
+.row:last-of-type{border-bottom:0}
 .row .lbl{font-size:14px;font-weight:500}
 .row .show{font-size:13px;color:var(--sheet-muted);display:flex;align-items:center;gap:6px}
 .row .show input{width:18px;height:18px;accent-color:var(--safety)}
@@ -103,55 +116,56 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
 .row input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--safety)}
 .note{font-size:13px;color:var(--sheet-muted);margin:8px 0 0;line-height:1.5}
 
-/* result */
-.result{position:fixed;inset:0;background:#000;z-index:20;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* photo viewer (used when the photo still needs saving) */
+.result{position:fixed;inset:0;background:#000;z-index:20;display:flex;flex-direction:column;padding:var(--st) var(--sr) var(--sb) var(--sl)}
 .result[hidden]{display:none}
-.result .imgwrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:10px}
-.result img{max-width:100%;max-height:100%;object-fit:contain}
-.result .actions{display:flex;gap:12px;justify-content:center;padding:14px 18px 18px;background:var(--chrome)}
-.result .status{text-align:center;font-size:13px;color:#bdbdbd;min-height:18px;padding:0 16px 4px;background:var(--chrome)}
+.result .imgwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px}
+.result img{max-width:100%;max-height:100%;object-fit:contain;-webkit-touch-callout:default}
+.result .status{text-align:center;font-size:13px;color:#bdbdbd;min-height:18px;padding:0 16px 6px}
+.result .actions{display:flex;gap:12px;justify-content:center;padding:6px 18px 16px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <button class="icon-btn" id="flipBtn" aria-label="切換前後鏡頭">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><path d="M9.5 12.5a3 3 0 0 1 5-1.5M14.5 14.5a3 3 0 0 1-5 1.5"/><path d="M14.8 9.6v1.6h-1.6M9.2 17.4v-1.6h1.6"/></svg>
-    </button>
-    <h1>📷 工地相機</h1>
-    <button class="icon-btn" id="settingsBtn" aria-label="設定浮水印內容">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
-      浮水印
-    </button>
-  </div>
-
-  <div class="viewport" id="viewport">
-    <video id="video" playsinline muted autoplay></video>
-    <img class="src" id="srcImg" alt="" hidden>
-    <canvas id="wm" aria-label="浮水印，可拖曳移動"></canvas>
-    <div class="hint" id="hint">拖曳浮水印可以移動位置</div>
-    <div class="fallback" id="fallback" hidden>
-      <p id="fallbackMsg">正在開啟相機…</p>
-      <label class="big-btn" for="fileCam">開啟相機拍照</label>
-      <label class="ghost-btn" for="fileAlbum">從相簿選照片</label>
-      <button class="ghost-btn" id="retryCam" hidden>重新嘗試即時相機</button>
-    </div>
-    <input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
-    <input type="file" id="fileAlbum" accept="image/*" hidden>
-    <div class="flash" id="flash"></div>
-  </div>
-
-  <div class="bottombar">
-    <label class="wm-toggle">
-      <input type="checkbox" id="wmToggle" checked>
-      <span class="switch" aria-hidden="true"></span>
-      <span id="wmLabel">浮水印 開</span>
-    </label>
-    <button class="shutter" id="shutter" aria-label="拍照"><span></span></button>
-    <button class="thumb" id="thumb" aria-label="查看上一張照片"></button>
-  </div>
+<div class="viewport" id="viewport">
+  <video id="video" playsinline muted autoplay></video>
+  <img class="src" id="srcImg" alt="" hidden>
+  <canvas id="wm" aria-label="浮水印，可拖曳移動"></canvas>
+  <div class="flash" id="flash"></div>
 </div>
+
+<div class="topbar">
+  <button class="icon-btn" id="flipBtn" aria-label="切換前後鏡頭">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><path d="M9.5 12.5a3 3 0 0 1 5-1.5M14.5 14.5a3 3 0 0 1-5 1.5"/><path d="M14.8 9.6v1.6h-1.6M9.2 17.4v-1.6h1.6"/></svg>
+  </button>
+  <h1>📸 工地相機</h1>
+  <button class="icon-btn" id="settingsBtn" aria-label="設定浮水印內容">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+    <span>浮水印</span>
+  </button>
+</div>
+
+<div class="bottombar" id="bottombar">
+  <label class="wm-toggle">
+    <input type="checkbox" id="wmToggle" checked>
+    <span class="switch" aria-hidden="true"></span>
+    <span id="wmLabel">浮水印 開</span>
+  </label>
+  <button class="shutter" id="shutter" aria-label="拍照並存到相簿"><span></span></button>
+  <button class="thumb empty" id="thumb" aria-label="查看上一張照片"></button>
+</div>
+
+<div class="hint" id="hint">拖曳浮水印可以移動位置</div>
+<div class="toast" id="toast" role="status"></div>
+
+<div class="fallback" id="fallback" hidden>
+  <p id="fallbackMsg">正在開啟相機…</p>
+  <label class="big-btn" for="fileCam">開啟相機拍照</label>
+  <label class="ghost-btn" for="fileAlbum">從相簿選照片</label>
+  <button class="ghost-btn" id="retryCam" hidden>重新嘗試即時相機</button>
+</div>
+<input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
+<input type="file" id="fileAlbum" accept="image/*" hidden>
 
 <div class="scrim" id="scrim"></div>
 <section class="sheet" id="sheet" aria-label="浮水印設定">
@@ -161,10 +175,9 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
   </header>
   <div class="body">
     <div class="row">
-      <span class="lbl">日期＋工地名稱</span>
+      <span class="lbl">工地名稱</span>
       <label class="show"><input type="checkbox" data-show="site" checked>顯示</label>
       <div class="field"><input type="text" data-key="site" placeholder="OOOO工地"></div>
-      <div class="auto">日期會自動帶入拍照當天</div>
     </div>
     <div class="row">
       <span class="lbl">施工區域</span>
@@ -179,7 +192,7 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     <div class="row">
       <span class="lbl">拍攝時間</span>
       <label class="show"><input type="checkbox" data-show="time" checked>顯示</label>
-      <div class="auto">按下快門時自動記錄</div>
+      <div class="auto">按下快門時自動記錄日期和時間</div>
     </div>
     <div class="row">
       <span class="lbl">天氣</span>
@@ -207,8 +220,8 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
   <div class="imgwrap"><img id="resultImg" alt="拍好的照片"></div>
   <div class="status" id="status"></div>
   <div class="actions">
-    <button class="ghost-btn" id="retake">繼續拍照</button>
-    <button class="big-btn" id="saveBtn">儲存照片</button>
+    <button class="ghost-btn" id="closeResult">繼續拍照</button>
+    <button class="big-btn" id="saveBtn">存到相簿</button>
   </div>
 </div>
 
@@ -216,9 +229,20 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
 (function(){
   const $ = id => document.getElementById(id);
   const video=$('video'), srcImg=$('srcImg'), viewport=$('viewport'), wm=$('wm');
-  const FONT = getComputedStyle(document.documentElement).getPropertyValue('--font').trim() || 'sans-serif';
+  const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif';
 
-  // ---------- storage ----------
+  // On Apple devices, redraw the home-screen icon with the system's own 📸
+  try{
+    if(/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent)){
+      const c=document.createElement('canvas'); c.width=c.height=180;
+      const x=c.getContext('2d'); x.fillStyle='#F5B800'; x.fillRect(0,0,180,180);
+      x.font='120px "Apple Color Emoji"'; x.textAlign='center'; x.textBaseline='middle';
+      x.fillText('📸',90,98);
+      $('touchIcon').href=c.toDataURL('image/png');
+    }
+  }catch(e){}
+
+  // ---------- settings ----------
   const store = {
     get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
     set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
@@ -232,13 +256,18 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
   S.show = Object.assign({}, defaults.show, S.show||{});
   const save = () => store.set('sitecam:settings', S);
 
-  // ---------- formatting ----------
   const pad = n => String(n).padStart(2,'0');
   const fmtDate = d => `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`;
   const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   const fileStamp = d => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 
-  // ---------- watermark drawing (shared by preview & final photo) ----------
+  let toastTimer;
+  function toast(msg, ms=2600){
+    const t=$('toast'); t.textContent=msg; t.classList.add('show'); $('hint').style.opacity=0;
+    clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), ms);
+  }
+
+  // ---------- watermark drawing (same code for preview and photo) ----------
   function wrap(ctx, text, maxW){
     const out=[]; let line='';
     for(const ch of Array.from(text)){
@@ -250,9 +279,9 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
   function layout(ctx, s, when){
     const W = 250*s, P = 11*s, inner = W-2*P;
     ctx.font = `700 ${15*s}px ${FONT}`;
-    const headText = fmtDate(when) + (S.show.site && S.site.trim() ? '  ' + S.site.trim() : '');
-    const head = wrap(ctx, headText, inner);
-    const headLH = 20*s, headH = head.length*headLH + 14*s;
+    const site = S.site.trim();
+    const head = (S.show.site && site) ? wrap(ctx, site, inner) : [];
+    const headLH = 20*s, headH = head.length ? head.length*headLH + 14*s : 0;
     ctx.font = `400 ${14*s}px ${FONT}`;
     const rows = [];
     const add = (k,label,val) => { if(S.show[k]) rows.push(...wrap(ctx, `${label}：${val||''}`, inner)); };
@@ -263,25 +292,24 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     add('location','地點',S.location.trim());
     const LH = 21*s;
     const bodyH = rows.length ? rows.length*LH + 14*s : 0;
-    return {W, P, head, headLH, headH, rows, LH, bodyH, H: headH+bodyH, r: 6*s, s};
+    return {W, P, head, headLH, headH, rows, LH, bodyH, H: Math.max(headH+bodyH, 1), r: 6*s, s};
   }
   function drawWM(ctx, L){
     const {W,P,head,headLH,headH,rows,LH,bodyH,H,r,s} = L;
+    if(!head.length && !rows.length) return;
     ctx.save();
     ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0,0,W,H,r) : ctx.rect(0,0,W,H); ctx.clip();
-    ctx.fillStyle = '#F5B800'; ctx.fillRect(0,0,W,headH);
-    ctx.fillStyle = 'rgba(18,18,18,0.66)'; ctx.fillRect(0,headH,W,bodyH);
+    if(headH){ ctx.fillStyle = '#F5B800'; ctx.fillRect(0,0,W,headH); }
+    if(bodyH){ ctx.fillStyle = 'rgba(18,18,18,0.66)'; ctx.fillRect(0,headH,W,bodyH); }
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#111';
-    ctx.font = `700 ${15*s}px ${FONT}`;
+    ctx.fillStyle = '#111'; ctx.font = `700 ${15*s}px ${FONT}`;
     head.forEach((t,i)=>ctx.fillText(t, P, 7*s + headLH*(i+.5)));
-    ctx.fillStyle = '#fff';
-    ctx.font = `400 ${14*s}px ${FONT}`;
+    ctx.fillStyle = '#fff'; ctx.font = `400 ${14*s}px ${FONT}`;
     rows.forEach((t,i)=>ctx.fillText(t, P, headH + 7*s + LH*(i+.5)));
     ctx.restore();
   }
 
-  // ---------- preview overlay ----------
+  // ---------- live overlay ----------
   let wmW=0, wmH=0;
   function renderPreview(){
     const dpr = window.devicePixelRatio||1;
@@ -294,11 +322,17 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     drawWM(c, L);
     placeWM();
   }
+  function defaultPos(vw, vh){
+    const bb = $('bottombar').getBoundingClientRect();
+    const portraitBar = bb.width > vw*0.6;         // bar across the bottom
+    const bottomGap = portraitBar ? (vh - bb.top) + 4 : 16;
+    const left = parseFloat(getComputedStyle($('bottombar')).paddingLeft) || 16;
+    return {x: portraitBar ? 14 : left + 70, y: vh - wmH - bottomGap};
+  }
   function placeWM(){
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
     let x, y;
-    if(S.pos){ x = S.pos.x*vw; y = S.pos.y*vh; }
-    else { x = 12; y = vh - wmH - 12; }
+    if(S.pos){ x = S.pos.x*vw; y = S.pos.y*vh; } else ({x,y} = defaultPos(vw,vh));
     x = Math.max(0, Math.min(x, vw-wmW)); y = Math.max(0, Math.min(y, vh-wmH));
     wm.style.transform = `translate(${x}px,${y}px)`;
     wm.dataset.x = x; wm.dataset.y = y;
@@ -310,7 +344,6 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     $('wmLabel').textContent = on ? '浮水印 開' : '浮水印 關';
   }
 
-  // drag
   let drag=null;
   wm.addEventListener('pointerdown', e=>{
     wm.setPointerCapture(e.pointerId);
@@ -324,12 +357,11 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     const y = Math.max(0, Math.min(drag.oy + e.clientY-drag.sy, vh-wmH));
     wm.style.transform = `translate(${x}px,${y}px)`; wm.dataset.x=x; wm.dataset.y=y;
   });
-  const endDrag = e=>{
+  const endDrag = ()=>{
     if(!drag) return; drag=null; wm.classList.remove('dragging');
     S.pos = {x:+wm.dataset.x/viewport.clientWidth, y:+wm.dataset.y/viewport.clientHeight}; save();
   };
   wm.addEventListener('pointerup', endDrag); wm.addEventListener('pointercancel', endDrag);
-  // keyboard nudge
   wm.tabIndex = 0;
   wm.addEventListener('keydown', e=>{
     const d={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];
@@ -339,18 +371,22 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
   });
 
   // ---------- camera ----------
-  let stream=null, facing='environment', source='none'; // 'video' | 'image' | 'none'
+  let stream=null, facing='environment', source='none';
   async function startCamera(){
     stopCamera();
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ return showFallback('這個瀏覽器無法直接開啟即時相機，請用下面的按鈕拍照。'); }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      return showFallback('這個瀏覽器無法直接開啟即時相機，請用下面的按鈕拍照。');
+    }
     try{
-      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:facing}, width:{ideal:1920}, height:{ideal:1080}}, audio:false});
+      stream = await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{ideal:facing}, width:{ideal:3840}, height:{ideal:2160}}, audio:false
+      });
       video.srcObject = stream; await video.play().catch(()=>{});
       srcImg.hidden = true; video.hidden = false; source='video';
       $('fallback').hidden = true; $('shutter').disabled = false;
     }catch(err){
       showFallback(err && err.name==='NotAllowedError'
-        ? '相機權限被拒絕了。可以用下面的按鈕改用手機內建相機拍照，或到瀏覽器設定允許相機。'
+        ? '相機權限被拒絕了。可以到「設定 → Safari → 相機」改成允許，或用下面的按鈕拍照。'
         : '無法開啟即時相機，請用下面的按鈕拍照。');
     }
   }
@@ -362,36 +398,52 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     $('shutter').disabled = true;
   }
   $('retryCam').onclick = startCamera;
-  $('flipBtn').onclick = ()=>{ facing = facing==='environment'?'user':'environment'; startCamera(); };
+  $('flipBtn').onclick = ()=>{ facing = facing==='environment'?'user':'environment'; if(source!=='image') startCamera(); };
+
+  // re-fit after rotating; restart the stream if its orientation didn't follow the phone
+  let rotTimer;
+  function onRotate(){
+    clearTimeout(rotTimer);
+    rotTimer = setTimeout(()=>{
+      placeWM();
+      if(source==='video' && video.videoWidth){
+        const screenLand = viewport.clientWidth > viewport.clientHeight;
+        const videoLand = video.videoWidth > video.videoHeight;
+        if(screenLand !== videoLand) startCamera();
+      }
+    }, 400);
+  }
+  window.addEventListener('resize', onRotate);
+  window.addEventListener('orientationchange', onRotate);
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState==='visible' && source==='video' && (!stream || !stream.active)) startCamera();
+  });
 
   function onFile(e){
     const f = e.target.files && e.target.files[0]; e.target.value='';
     if(!f) return;
-    const url = URL.createObjectURL(f);
     srcImg.onload = ()=>{
       stopCamera(); video.hidden = true; srcImg.hidden = false; source='image';
       $('fallback').hidden = true; $('shutter').disabled = false;
-      $('hint').textContent = '把浮水印拖到想要的位置，再按快門合成'; $('hint').style.opacity=1;
+      $('hint').textContent = '把浮水印拖到想要的位置，再按快門'; $('hint').style.opacity=1;
     };
-    srcImg.src = url;
+    srcImg.src = URL.createObjectURL(f);
   }
   $('fileCam').addEventListener('change', onFile);
   $('fileAlbum').addEventListener('change', onFile);
 
   // ---------- capture ----------
-  function capture(){
-    const when = new Date();
+  function renderPhoto(when){
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
     let el, sw0, sh0, cover;
     if(source==='video'){ el=video; sw0=video.videoWidth; sh0=video.videoHeight; cover=true; }
     else if(source==='image'){ el=srcImg; sw0=srcImg.naturalWidth; sh0=srcImg.naturalHeight; cover=false; }
-    else return;
-    if(!sw0||!sh0) return;
+    else return null;
+    if(!sw0||!sh0) return null;
     const k = cover ? Math.max(vw/sw0, vh/sh0) : Math.min(vw/sw0, vh/sh0);
     const offX = (vw - sw0*k)/2, offY = (vh - sh0*k)/2;
-    // region of the source to keep
     let rx=0, ry=0, rw=sw0, rh=sh0;
-    if(cover){ rx=-offX/k; ry=-offY/k; rw=vw/k; rh=vh/k; }
+    if(cover){ rx=-offX/k; ry=-offY/k; rw=vw/k; rh=vh/k; }   // exactly what is on screen
     const out = document.createElement('canvas');
     out.width = Math.round(rw); out.height = Math.round(rh);
     const c = out.getContext('2d');
@@ -402,47 +454,56 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
       x = Math.max(0, Math.min(x, out.width-L.W)); y = Math.max(0, Math.min(y, out.height-L.H));
       c.translate(x,y); drawWM(c, L);
     }
-    const f=$('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
-    out.toBlob(blob=>{
-      if(!blob) return;
-      last = {blob, name:`工地照片_${fileStamp(when)}.jpg`, url:URL.createObjectURL(blob)};
-      $('thumb').style.backgroundImage = `url(${last.url})`; $('thumb').textContent=' ';
-      openResult();
-    }, 'image/jpeg', 0.92);
+    return out;
   }
-  let last=null;
-  $('shutter').onclick = capture;
-  $('thumb').onclick = ()=>{ if(last) openResult(); };
+  function dataURLtoBlob(u){
+    const [meta, b64] = u.split(','); const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    return new Blob([arr], {type: meta.slice(5).split(';')[0]});
+  }
 
-  // ---------- result / save ----------
-  let downloads = null;
-  function openResult(){
-    $('resultImg').src = last.url; $('result').hidden = false;
-    $('status').textContent = '';
-    $('saveBtn').hidden = false;
+  let last=null;
+  function shareToPhotos(){
+    // Must run inside the tap so iOS allows the share sheet ("儲存影像" puts it in Photos)
+    const file = new File([last.blob], last.name, {type:'image/jpeg'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      return navigator.share({files:[file]}).then(()=>{
+        last.saved = true; toast('✓ 已存到相簿');
+        $('result').hidden = true;
+      }).catch(err=>{
+        if(err && err.name==='AbortError') toast('還沒存入相簿，點右下角縮圖可以再存');
+        else openResult('無法開啟分享，請長按照片選「加入照片」');
+      });
+    }
+    openResult('長按照片，選「加入照片」就會存到相簿');
+    return Promise.resolve();
   }
-  $('retake').onclick = ()=>{
-    $('result').hidden = true;
-    if(source==='image'){ showFallback('要再拍一張嗎？'); }
+
+  $('shutter').onclick = ()=>{
+    const when = new Date();
+    const canvas = renderPhoto(when);
+    if(!canvas) return;
+    const f=$('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    const url = canvas.toDataURL('image/jpeg', 0.92);        // synchronous: keeps the tap "fresh" for iOS
+    if(last && last.url.startsWith('blob:')) URL.revokeObjectURL(last.url);
+    const blob = dataURLtoBlob(url);
+    last = {blob, url: URL.createObjectURL(blob), name:`工地照片_${fileStamp(when)}.jpg`, saved:false};
+    $('thumb').style.backgroundImage = `url(${last.url})`; $('thumb').classList.remove('empty');
+    shareToPhotos();
   };
-  $('saveBtn').onclick = async ()=>{
+
+  function openResult(msg){
     if(!last) return;
-    $('status').textContent = '';
-    if(!downloads){
-      const a=document.createElement('a'); a.href=last.url; a.download=last.name;
-      document.body.appendChild(a); a.click(); a.remove();
-      $('status').textContent='已下載 '+last.name+'（iPhone 也可以長按照片存到相簿）';
-      return;
-    }
-    try{
-      await downloads.save({filename:last.name, data:last.blob});
-      $('status').textContent = '已儲存 ' + last.name;
-    }catch(err){
-      const code = err && err.code;
-      if(code==='declined') $('status').textContent = '已取消儲存';
-      else if(code==='rate_limited') $('status').textContent = '請稍候再按一次儲存';
-      else { downloads=null; $('status').textContent = '請再按一次儲存，或長按照片存到相簿'; }
-    }
+    $('resultImg').src = last.url; $('status').textContent = msg || '';
+    $('saveBtn').hidden = !(navigator.canShare);
+    $('result').hidden = false;
+  }
+  $('thumb').onclick = ()=>openResult(last && last.saved ? '這張已經存到相簿了' : '');
+  $('saveBtn').onclick = ()=>{ if(last) shareToPhotos(); };
+  $('closeResult').onclick = ()=>{
+    $('result').hidden = true;
+    if(source==='image') showFallback('要再拍一張嗎？');
   };
 
   // ---------- settings sheet ----------
@@ -473,24 +534,19 @@ button:focus-visible,input:focus-visible,label:focus-within{outline:2px solid va
     navigator.geolocation.getCurrentPosition(p=>{
       inp.value = `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
       S.location=inp.value; save(); renderPreview(); $('gpsBtn').textContent='📍 定位';
-    }, ()=>{ inp.value=''; inp.placeholder='無法取得定位，請手動輸入'; $('gpsBtn').textContent='📍 定位'; }, {enableHighAccuracy:true, timeout:10000});
+    }, ()=>{ inp.placeholder='無法取得定位，請手動輸入'; $('gpsBtn').textContent='📍 定位'; }, {enableHighAccuracy:true, timeout:10000});
   };
-
   $('wmToggle').addEventListener('change', e=>setEnabled(e.target.checked));
 
   // ---------- boot ----------
   setEnabled(S.enabled);
-  const fontReady = (document.fonts && document.fonts.load) ? Promise.all([document.fonts.load(`700 15px "Noto Sans TC"`, '工地'), document.fonts.load(`400 14px "Noto Sans TC"`, '工地')]).catch(()=>{}) : Promise.resolve();
   renderPreview();
-  fontReady.then(renderPreview);
-  setInterval(()=>{ renderPreview(); }, 1000);
-  window.addEventListener('resize', placeWM);
+  if(document.fonts && document.fonts.load){
+    Promise.all([document.fonts.load('700 15px "Noto Sans TC"','工地'), document.fonts.load('400 14px "Noto Sans TC"','工地')]).then(renderPreview, ()=>{});
+  }
+  setInterval(renderPreview, 1000);
   setTimeout(()=>{ $('hint').style.opacity=0; }, 4000);
   startCamera();
-
-  if(window.claude && window.claude.use){
-    window.claude.use('downloads').then(d=>{ downloads=d; }).catch(()=>{});
-  }
 })();
 </script>
 </body>
