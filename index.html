@@ -227,19 +227,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   </header>
   <div class="body">
     <div class="row">
-      <span class="lbl">工地名稱</span>
+      <span class="lbl">標題</span>
       <label class="show"><input type="checkbox" data-show="site" checked>顯示</label>
-      <div class="field"><input type="text" data-key="site" placeholder="OOOO工地"></div>
+      <div class="field"><input type="text" data-key="site" placeholder="例：OOOO工地"></div>
     </div>
     <div class="row">
       <span class="lbl">施工區域</span>
       <label class="show"><input type="checkbox" data-show="area" checked>顯示</label>
-      <div class="field"><input type="text" data-key="area" placeholder="例：B棟 3F"></div>
+      <div class="field"><input type="text" data-key="area" placeholder="例：大里港洲C"></div>
     </div>
     <div class="row">
       <span class="lbl">施工內容</span>
       <label class="show"><input type="checkbox" data-show="content" checked>顯示</label>
-      <div class="field"><input type="text" data-key="content" placeholder="例：樓板鋼筋綁紮"></div>
+      <div class="field"><input type="text" data-key="content" placeholder="例：工具箱會議安全宣導"></div>
     </div>
     <div class="row">
       <span class="lbl">拍攝時間</span>
@@ -311,12 +311,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
   };
   const defaults = {
-    site:'OOOO工地', area:'', content:'', weather:'', location:'',
+    site:'', area:'', content:'', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true},
     ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
+  if(S.site==='OOOO工地') S.site='';
   const save = () => store.set('sitecam:settings', S);
 
   const pad = n => String(n).padStart(2,'0');
@@ -346,8 +347,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     const head = (S.show.site && site) ? wrap(ctx, site, inner) : [];
     const headLH = 20*s, headH = head.length ? head.length*headLH + 14*s : 0;
     ctx.font = `400 ${14*s}px ${FONT}`;
-    const rows = [];
-    const add = (k,label,val) => { if(S.show[k]) rows.push(...wrap(ctx, `${label}：${val||''}`, inner)); };
+    const labelW = ctx.measureText('施工區域').width;     // every label spreads to this width
+    const colonW = ctx.measureText('：').width;
+    const valW = inner - labelW - colonW;
+    const rows = [];                                     // one entry per text line
+    const add = (k,label,val) => {
+      if(!S.show[k]) return;
+      wrap(ctx, val||'', valW).forEach((t,i)=>rows.push({label: i===0 ? label : '', text:t}));
+    };
     add('area','施工區域',S.area.trim());
     add('content','施工內容',S.content.trim());
     add('time','拍攝時間',fmtDate(when)+' '+fmtTime(when));
@@ -355,7 +362,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     add('location','地點',S.location.trim());
     const LH = 21*s;
     const bodyH = rows.length ? rows.length*LH + 14*s : 0;
-    return {W, P, head, headLH, headH, rows, LH, bodyH, H: Math.max(headH+bodyH, 1), r: 6*s, s};
+    return {W, P, head, headLH, headH, rows, LH, bodyH, labelW, colonW, H: Math.max(headH+bodyH, 1), r: 6*s, s};
   }
   function drawWM(ctx, L){
     const {W,P,head,headLH,headH,rows,LH,bodyH,H,r,s} = L;
@@ -369,7 +376,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     ctx.fillStyle = '#111'; ctx.font = `700 ${15*s}px ${FONT}`;
     head.forEach((t,i)=>ctx.fillText(t, P, 7*s + headLH*(i+.5)));
     ctx.fillStyle = '#fff'; ctx.font = `400 ${14*s}px ${FONT}`;
-    rows.forEach((t,i)=>ctx.fillText(t, P, headH + 7*s + LH*(i+.5)));
+    const {labelW, colonW} = L;
+    rows.forEach((row,i)=>{
+      const y = headH + 7*s + LH*(i+.5);
+      if(row.label){
+        const ch = Array.from(row.label);
+        const used = ch.reduce((a,c)=>a+ctx.measureText(c).width, 0);
+        const gap = ch.length>1 ? (labelW-used)/(ch.length-1) : 0;
+        let x = P;
+        ch.forEach(c=>{ ctx.fillText(c, x, y); x += ctx.measureText(c).width + gap; });
+        ctx.fillText('：', P+labelW, y);
+      }
+      ctx.fillText(row.text, P+labelW+colonW, y);
+    });
     ctx.restore();
   }
 
