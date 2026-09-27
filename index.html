@@ -149,6 +149,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .result img{max-width:100%;max-height:100%;object-fit:contain;-webkit-touch-callout:default}
 .result .status{text-align:center;font-size:13px;color:#bdbdbd;min-height:18px;padding:0 16px 6px}
 .result .actions{display:flex;gap:12px;justify-content:center;padding:6px 18px 16px}
+.theme-pick{margin-top:18px}
+.theme-pick .lbl{font-size:14px;font-weight:500}
+.theme-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.theme-btn{display:flex;flex-direction:column;align-items:stretch;padding:8px;border-radius:12px;border:2px solid var(--field-border);background:var(--field-bg);cursor:pointer;font-family:inherit}
+.theme-btn[aria-checked="true"]{border-color:var(--safety)}
+.theme-btn .sw-head{font-size:13px;font-weight:700;text-align:center;padding:5px 0;border-radius:6px 6px 0 0}
+.theme-btn .sw-body{font-size:12px;text-align:left;padding:6px 8px 10px;border-radius:0 0 6px 6px}
+.theme-btn .sw-name{font-size:12px;color:var(--sheet-text);margin-top:6px}
 .legal{margin-top:22px;padding-top:16px;border-top:1px solid var(--field-border);font-size:13px;line-height:1.7;color:var(--sheet-muted)}
 .legal h3{margin:0 0 6px;font-size:14px;color:var(--sheet-text)}
 .legal p{margin:0 0 6px}
@@ -281,6 +289,21 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="1" aria-label="浮水印不透明度">
     </div>
     <p class="note">天氣溫度和地點會自動帶入，也可以直接修改；手動改過的內容在這次使用期間不會被自動更新蓋掉，按「重新抓取」或下次打開 App 時才會更新。</p>
+    <div class="theme-pick">
+      <span class="lbl">浮水印配色</span>
+      <div class="theme-btns" role="radiogroup" aria-label="浮水印配色">
+        <button type="button" class="theme-btn" data-theme-choice="yellow" role="radio">
+          <span class="sw-head" style="background:#F5B800;color:#111">標題</span>
+          <span class="sw-body" style="background:#2b2b2b;color:#fff">內容</span>
+          <span class="sw-name">黃底黑字＋黑底白字</span>
+        </button>
+        <button type="button" class="theme-btn" data-theme-choice="blue" role="radio">
+          <span class="sw-head" style="background:#1D5FC4;color:#fff">標題</span>
+          <span class="sw-body" style="background:#fff;color:#111;border:1px solid #ddd;border-top:0">內容</span>
+          <span class="sw-name">藍底白字＋白底黑字</span>
+        </button>
+      </div>
+    </div>
     <div class="legal">
       <h3>【隱私與免責聲明】</h3>
       <p>本相機由棋傑二次反坎製作。不收集、不儲存、不上傳任何個人資料。</p>
@@ -325,7 +348,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   const defaults = {
     site:'', area:'', content:'', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true},
-    order:['area','content','time','weather','location'], ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
+    order:['area','content','time','weather','location'], theme:'yellow', ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
@@ -381,20 +404,25 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     const bodyH = rows.length ? rows.length*LH + 14*s : 0;
     return {W, P, head, headLH, headH, rows, LH, bodyH, labelW, colonW, H: Math.max(headH+bodyH, 1), r: 6*s, s};
   }
+  const THEMES = {
+    yellow:{headBg:'#F5B800', headFg:'#111111', bodyBg:'rgba(18,18,18,0.66)',  bodyFg:'#ffffff'},
+    blue:  {headBg:'#1D5FC4', headFg:'#ffffff', bodyBg:'rgba(255,255,255,0.9)', bodyFg:'#111111'}
+  };
   function drawWM(ctx, L){
     const {W,P,head,headLH,headH,rows,LH,bodyH,H,r,s} = L;
     if(!head.length && !rows.length) return;
     ctx.save();
     ctx.globalAlpha = S.opacity;
     ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0,0,W,H,r) : ctx.rect(0,0,W,H); ctx.clip();
-    if(headH){ ctx.fillStyle = '#F5B800'; ctx.fillRect(0,0,W,headH); }
-    if(bodyH){ ctx.fillStyle = 'rgba(18,18,18,0.66)'; ctx.fillRect(0,headH,W,bodyH); }
+    const T = THEMES[S.theme] || THEMES.yellow;
+    if(headH){ ctx.fillStyle = T.headBg; ctx.fillRect(0,0,W,headH); }
+    if(bodyH){ ctx.fillStyle = T.bodyBg; ctx.fillRect(0,headH,W,bodyH); }
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#111'; ctx.font = `700 ${15*s}px ${FONT}`;
+    ctx.fillStyle = T.headFg; ctx.font = `700 ${15*s}px ${FONT}`;
     ctx.textAlign = 'center';
     head.forEach((t,i)=>ctx.fillText(t, W/2, 7*s + headLH*(i+.5)));
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#fff'; ctx.font = `400 ${14*s}px ${FONT}`;
+    ctx.fillStyle = T.bodyFg; ctx.font = `400 ${14*s}px ${FONT}`;
     const {labelW, colonW} = L;
     rows.forEach((row,i)=>{
       const y = headH + 7*s + LH*(i+.5);
@@ -833,6 +861,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   $('locBtn').onclick = ()=>refreshField('location');
   setInterval(()=>refreshAuto(false), 5*60*1000);
   $('wmToggle').addEventListener('change', e=>setEnabled(e.target.checked));
+  function syncTheme(){
+    document.querySelectorAll('[data-theme-choice]').forEach(b=>b.setAttribute('aria-checked', String(b.dataset.themeChoice===S.theme)));
+  }
+  document.querySelectorAll('[data-theme-choice]').forEach(b=>b.addEventListener('click', ()=>{
+    S.theme=b.dataset.themeChoice; save(); syncTheme(); renderPreview();
+  }));
+  syncTheme();
 
   // ---------- reorder watermark items in settings ----------
   const list=$('orderList'), sheetBody=document.querySelector('.sheet .body');
