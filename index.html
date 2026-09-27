@@ -140,6 +140,17 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .result img{max-width:100%;max-height:100%;object-fit:contain;-webkit-touch-callout:default}
 .result .status{text-align:center;font-size:13px;color:#bdbdbd;min-height:18px;padding:0 16px 6px}
 .result .actions{display:flex;gap:12px;justify-content:center;padding:6px 18px 16px}
+.legal{margin-top:22px;padding-top:16px;border-top:1px solid var(--field-border);font-size:13px;line-height:1.7;color:var(--sheet-muted)}
+.legal h3{margin:0 0 6px;font-size:14px;color:var(--sheet-text)}
+.legal p{margin:0 0 6px}
+.consent{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;
+  padding:calc(var(--st) + 20px) calc(var(--sr) + 20px) calc(var(--sb) + 20px) calc(var(--sl) + 20px)}
+.consent[hidden]{display:none}
+.consent-card{background:var(--sheet-bg);color:var(--sheet-text);border-radius:16px;max-width:420px;width:100%;max-height:100%;display:flex;flex-direction:column;padding:20px 20px 18px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.consent-card h2{margin:0 0 10px;font-size:17px;text-align:center}
+.consent-text{overflow-y:auto;font-size:14px;line-height:1.75;-webkit-overflow-scrolling:touch}
+.consent-text p{margin:0 0 8px}
+.consent-card .big-btn{margin-top:12px;width:100%}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -195,6 +206,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 <input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="fileAlbum" accept="image/*" hidden>
 
+<div class="consent" id="consent" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
+  <div class="consent-card">
+    <h2 id="consentTitle">【隱私與免責聲明】</h2>
+    <div class="consent-text">
+      <p>本相機由棋傑二次反坎製作。不收集、不儲存、不上傳任何個人資料。</p>
+      <p>申請相機及定位權限僅用於拍照、存圖與自動填入天氣、地址資訊。</p>
+      <p>自動填入天氣與地址時，會將當下位置座標傳送至 Open-Meteo 及 OpenStreetMap 查詢，不含其他個人資料。</p>
+      <p>本服務按現狀提供，製作者不保證服務不中斷，亦不承擔因使用本網頁（如資料遺失或定位誤差）所生之任何損害賠償責任。</p>
+    </div>
+    <button class="big-btn" id="consentOk">確定</button>
+  </div>
+</div>
+
 <div class="scrim" id="scrim"></div>
 <section class="sheet" id="sheet" aria-label="浮水印設定">
   <header>
@@ -245,6 +269,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="1" aria-label="浮水印不透明度">
     </div>
     <p class="note">天氣溫度和地點會自動帶入，也可以直接修改；手動改過的內容在這次使用期間不會被自動更新蓋掉，按「重新抓取」或下次打開 App 時才會更新。</p>
+    <div class="legal">
+      <h3>【隱私與免責聲明】</h3>
+      <p>本相機由棋傑二次反坎製作。不收集、不儲存、不上傳任何個人資料。</p>
+      <p>申請相機及定位權限僅用於拍照、存圖與自動填入天氣、地址資訊。</p>
+      <p>自動填入天氣與地址時，會將當下位置座標傳送至 Open-Meteo 及 OpenStreetMap 查詢，不含其他個人資料。</p>
+      <p>本服務按現狀提供，製作者不保證服務不中斷，亦不承擔因使用本網頁（如資料遺失或定位誤差）所生之任何損害賠償責任。</p>
+    </div>
   </div>
 </section>
 
@@ -513,7 +544,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   sun.addEventListener('pointerup', endSun); sun.addEventListener('pointercancel', endSun);
 
   // ---------- camera ----------
-  let stream=null, facing='environment', source='none', resumes=[];
+  let stream=null, facing='environment', source='none', resumes=[], accepted=false;
   async function startCamera(){
     stopCamera();
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
@@ -580,6 +611,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   window.addEventListener('resize', onRotate);
   window.addEventListener('orientationchange', onRotate);
   document.addEventListener('visibilitychange', ()=>{
+    if(!accepted) return;
     if(document.visibilityState==='visible' && source==='video' && (!stream || !stream.active)) startCamera();
     if(document.visibilityState==='visible') refreshAuto(false);
   });
@@ -750,6 +782,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   }
   // automatic refresh skips anything the user typed in by hand this session
   function refreshAuto(force){
+    if(!accepted) return;
     if(!force && Date.now()-lastAuto < 10*60*1000) return;
     lastAuto = Date.now();
     if(!manual.location) refreshField('location');
@@ -776,9 +809,15 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     Promise.all([document.fonts.load('700 15px "Noto Sans TC"','工地'), document.fonts.load('400 14px "Noto Sans TC"','工地')]).then(renderPreview, ()=>{});
   }
   setInterval(renderPreview, 1000);
-  setTimeout(()=>{ $('hint').style.opacity=0; }, 4000);
-  startCamera();
-  setTimeout(()=>refreshAuto(true), 1200);
+  $('hint').style.opacity=0;
+  $('consentOk').focus();
+  $('consentOk').onclick = ()=>{
+    accepted = true;
+    $('consent').hidden = true;
+    $('hint').style.opacity=1; setTimeout(()=>{ $('hint').style.opacity=0; }, 4000);
+    startCamera();
+    setTimeout(()=>refreshAuto(true), 1200);
+  };
 })();
 </script>
 </body>
