@@ -11,16 +11,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="工地相機">
 <meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="./manifest.json">
 <style>
 :root{
   --safety:#F5B800;
   --chrome-text:#f4f4f4;
   --sheet-bg:#ffffff; --sheet-text:#1d1d1d; --sheet-muted:#6b6b6b;
   --field-bg:#f1f1ef; --field-border:#dcdcd8;
-  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+  --font:"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans CJK TC","Noto Sans TC",sans-serif;
   --st:env(safe-area-inset-top,0px); --sb:env(safe-area-inset-bottom,0px);
   --sl:env(safe-area-inset-left,0px); --sr:env(safe-area-inset-right,0px);
 }
@@ -327,7 +325,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 (function(){
   const $ = id => document.getElementById(id);
   const video=$('video'), srcImg=$('srcImg'), viewport=$('viewport'), wm=$('wm');
-  const FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif';
+  const FONT = '"PingFang TC","Heiti TC","Microsoft JhengHei","Noto Sans CJK TC","Noto Sans TC",sans-serif';
 
   // On Apple devices, redraw the home-screen icon with the system's own 📸
   try{
@@ -926,8 +924,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   setEnabled(S.enabled);
   layoutFrame();
   renderPreview();
-  if(document.fonts && document.fonts.load){
-    Promise.all([document.fonts.load('700 15px "Noto Sans TC"','工地'), document.fonts.load('400 14px "Noto Sans TC"','工地')]).then(renderPreview, ()=>{});
+  // offline support: keep a copy of the app on the phone after the first visit
+  if('serviceWorker' in navigator && location.protocol!=='file:'){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
   setInterval(renderPreview, 1000);
   $('hint').style.opacity=0;
