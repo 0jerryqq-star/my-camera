@@ -66,7 +66,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .bottombar{position:fixed;left:0;right:0;bottom:0;z-index:3;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
   padding:26px calc(var(--sr) + 18px) calc(var(--sb) + 18px) calc(var(--sl) + 18px);
   background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.6))}
-.wm-toggle{justify-self:start;display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.wm-group{justify-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.set-btn{padding:6px 10px;font-size:13px}
+.set-btn svg{width:18px;height:18px}
+.wm-toggle{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;user-select:none;text-shadow:0 1px 3px rgba(0,0,0,.7)}
 .wm-toggle input{position:absolute;opacity:0;width:1px;height:1px}
 .switch{flex:none;width:46px;height:28px;border-radius:14px;background:rgba(80,80,80,.9);position:relative;transition:background .2s}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s}
@@ -89,7 +92,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   .bottombar{left:auto;top:0;grid-template-columns:none;grid-template-rows:1fr auto 1fr;justify-items:center;
     padding:calc(var(--st) + 14px) calc(var(--sr) + 16px) calc(var(--sb) + 14px) 26px;
     background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.5))}
-  .wm-toggle{justify-self:center;align-self:start;flex-direction:column;gap:6px;font-size:12px}
+  .wm-group{justify-self:center;align-self:start;align-items:center}
+  .wm-toggle{flex-direction:column;gap:6px;font-size:12px}
   .thumb{justify-self:center;align-self:end}
 }
 
@@ -121,7 +125,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .row input[type=text]{flex:1;min-width:0;background:var(--field-bg);border:1px solid var(--field-border);color:var(--sheet-text);border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit}
 .row .auto{grid-column:1 / -1;font-size:14px;color:var(--sheet-muted)}
 .row .auto:empty{display:none}
-.row .opt{grid-column:1 / -1;font-size:14px}
+.row .auto.live{color:var(--sheet-text);font-size:15px}
+.small-btn.wide{padding:10px 12px;flex:1}
 .chips{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px}
 .chips button{background:var(--field-bg);border:1px solid var(--field-border);color:var(--sheet-text);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
 .small-btn{background:var(--field-bg);border:1px solid var(--field-border);color:var(--sheet-text);border-radius:10px;padding:0 12px;font-size:14px;cursor:pointer;white-space:nowrap}
@@ -158,20 +163,22 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   <button class="icon-btn" id="flipBtn" aria-label="切換前後鏡頭">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><path d="M9.5 12.5a3 3 0 0 1 5-1.5M14.5 14.5a3 3 0 0 1-5 1.5"/><path d="M14.8 9.6v1.6h-1.6M9.2 17.4v-1.6h1.6"/></svg>
   </button>
-  <button class="icon-btn ratio" id="ratioBtn" aria-label="切換照片比例">4:3</button>
   <h1>📸 工地相機</h1>
-  <button class="icon-btn" id="settingsBtn" aria-label="設定浮水印內容">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
-    <span>浮水印</span>
-  </button>
+  <button class="icon-btn ratio" id="ratioBtn" aria-label="切換照片比例">4:3</button>
 </div>
 
 <div class="bottombar" id="bottombar">
-  <label class="wm-toggle">
-    <input type="checkbox" id="wmToggle" checked>
-    <span class="switch" aria-hidden="true"></span>
-    <span id="wmLabel">浮水印 開</span>
-  </label>
+  <div class="wm-group">
+    <label class="wm-toggle">
+      <input type="checkbox" id="wmToggle" checked>
+      <span class="switch" aria-hidden="true"></span>
+      <span id="wmLabel">浮水印 開</span>
+    </label>
+    <button class="icon-btn set-btn" id="settingsBtn" aria-label="浮水印設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+      <span>浮水印設定</span>
+    </button>
+  </div>
   <button class="shutter" id="shutter" aria-label="拍照並存到相簿"><span></span></button>
   <button class="thumb empty" id="thumb" aria-label="查看上一張照片"></button>
 </div>
@@ -216,19 +223,15 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       <div class="auto">按下快門時自動記錄日期和時間</div>
     </div>
     <div class="row">
-      <span class="lbl">天氣</span>
+      <span class="lbl">天氣／溫度</span>
       <label class="show"><input type="checkbox" data-show="weather" checked>顯示</label>
-      <div class="field"><input type="text" data-key="weather" placeholder="例：晴"></div>
-      <div class="chips" id="weatherChips">
-        <button type="button">晴</button><button type="button">多雲</button><button type="button">陰</button><button type="button">小雨</button><button type="button">大雨</button><button type="button">雷雨</button>
-      </div>
+      <div class="auto live" id="weatherInfo">自動從網路抓取</div>
     </div>
     <div class="row">
       <span class="lbl">地點</span>
       <label class="show"><input type="checkbox" data-show="location" checked>顯示</label>
-      <div class="field"><input type="text" data-key="location" placeholder="例：台北市信義區"><button type="button" class="small-btn" id="gpsBtn">📍 定位</button></div>
-      <label class="show opt"><input type="checkbox" id="autoLoc">每次打開自動找最近的門牌</label>
-      <div class="auto" id="locInfo"></div>
+      <div class="auto live" id="locInfo">自動定位並找最近的門牌</div>
+      <div class="field"><button type="button" class="small-btn wide" id="refreshBtn">🔄 重新抓取地點和天氣</button></div>
     </div>
     <div class="row">
       <span class="lbl">浮水印大小</span>
@@ -240,7 +243,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       <span class="show" id="opacityVal">100%</span>
       <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="1" aria-label="浮水印不透明度">
     </div>
-    <p class="note">設定會記在這台裝置上，下次打開會自動帶入。</p>
+    <p class="note">你只需要填工地名稱、施工區域和施工內容。拍攝時間、天氣溫度和地點都會自動帶入；設定會記在這台裝置上。</p>
   </div>
 </section>
 
@@ -278,7 +281,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   const defaults = {
     site:'OOOO工地', area:'', content:'', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true},
-    ratio:'4:3', scale:1, opacity:1, autoLoc:true, enabled:true, pos:null
+    ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
@@ -577,7 +580,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   window.addEventListener('orientationchange', onRotate);
   document.addEventListener('visibilitychange', ()=>{
     if(document.visibilityState==='visible' && source==='video' && (!stream || !stream.active)) startCamera();
-    if(document.visibilityState==='visible' && S.autoLoc) locate(true);
+    if(document.visibilityState==='visible') refreshAuto(false);
   });
 
   function onFile(e){
@@ -681,18 +684,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     cb.checked = !!S.show[cb.dataset.show];
     cb.addEventListener('change', ()=>{ S.show[cb.dataset.show]=cb.checked; save(); renderPreview(); });
   });
-  $('weatherChips').addEventListener('click', e=>{
-    if(e.target.tagName!=='BUTTON') return;
-    const inp=document.querySelector('[data-key=weather]'); inp.value=e.target.textContent;
-    S.weather=inp.value; save(); renderPreview();
-  });
   const scale=$('scale');
   scale.value=S.scale; $('scaleVal').textContent=Math.round(S.scale*100)+'%';
   scale.addEventListener('input', ()=>{ S.scale=+scale.value; $('scaleVal').textContent=Math.round(S.scale*100)+'%'; save(); renderPreview(); });
   const op=$('opacity');
   op.value=S.opacity; $('opacityVal').textContent=Math.round(S.opacity*100)+'%';
   op.addEventListener('input', ()=>{ S.opacity=+op.value; $('opacityVal').textContent=Math.round(S.opacity*100)+'%'; save(); renderPreview(); });
-  // Find coordinates, then the nearest street address (OpenStreetMap reverse geocoding)
+  // ---------- automatic location + weather (no setup needed) ----------
   function twAddress(a){
     const city = a.city || a.county || a.state || '';
     const dist = a.city_district || a.district || a.suburb || a.town || a.township || '';
@@ -701,40 +699,53 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     if(no && !/號$/.test(no)) no += '號';
     return (city + (dist!==city?dist:'') + road + no) || '';
   }
-  let locating=false, lastAuto=0;
-  function locate(auto){
-    const inp=document.querySelector('[data-key=location]'), info=$('locInfo'), btn=$('gpsBtn');
-    if(locating) return;
-    if(auto && Date.now()-lastAuto < 60000) return;
-    if(auto) lastAuto = Date.now();
-    if(!navigator.geolocation){ info.textContent='這台裝置無法定位，請手動輸入'; return; }
-    locating=true; btn.textContent='定位中…'; info.textContent='';
-    const done = ()=>{ locating=false; btn.textContent='📍 定位'; };
-    navigator.geolocation.getCurrentPosition(async p=>{
-      const lat=p.coords.latitude, lon=p.coords.longitude, coord=`${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-      const acc=Math.round(p.coords.accuracy);
-      btn.textContent='找門牌…';
-      let addr='';
-      try{
-        const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
-        const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`,{signal:ctrl.signal});
-        clearTimeout(t);
-        if(r.ok){ const j=await r.json(); addr = j.address ? twAddress(j.address) : ''; }
-      }catch(e){}
-      inp.value = addr || coord;
-      S.location = inp.value; save(); renderPreview();
-      info.textContent = addr
-        ? `座標 ${coord}（誤差約 ${acc} 公尺）。門牌不準可以直接修改。`
-        : `座標 ${coord}。找不到附近門牌（可能沒有網路），已先填入座標。`;
-      done();
-    }, err=>{
-      info.textContent = err && err.code===1 ? '定位權限被拒絕，可到「設定 → 隱私權 → 定位服務」開啟' : '無法取得定位，請手動輸入';
-      done();
-    }, {enableHighAccuracy:true, timeout:15000, maximumAge:30000});
+  const WMO = c => c===0?'晴':c===1?'晴時多雲':c===2?'多雲':c===3?'陰':(c===45||c===48)?'霧':
+    (c>=51&&c<=57)?'毛毛雨':c===61?'小雨':c===63?'中雨':c===65?'大雨':(c===66||c===67)?'凍雨':
+    (c>=71&&c<=77)?'下雪':(c===80||c===81)?'陣雨':c===82?'強陣雨':(c===85||c===86)?'陣雪':
+    c===95?'雷雨':(c===96||c===99)?'雷雨夾冰雹':'';
+  async function getJSON(url){
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),9000);
+    try{ const r=await fetch(url,{signal:ctrl.signal}); return r.ok ? await r.json() : null; }
+    catch(e){ return null; } finally{ clearTimeout(t); }
   }
-  $('gpsBtn').onclick = ()=>locate(false);
-  const autoLoc=$('autoLoc'); autoLoc.checked=!!S.autoLoc;
-  autoLoc.addEventListener('change', ()=>{ S.autoLoc=autoLoc.checked; save(); if(S.autoLoc) locate(false); });
+  let refreshing=false, lastRefresh=0;
+  function refreshAuto(force){
+    if(refreshing) return;
+    if(!force && Date.now()-lastRefresh < 10*60*1000) return;
+    const wInfo=$('weatherInfo'), lInfo=$('locInfo'), btn=$('refreshBtn');
+    if(!navigator.geolocation){ lInfo.textContent='這台裝置無法定位'; return; }
+    refreshing=true; btn.textContent='定位中…';
+    const done=()=>{ refreshing=false; btn.textContent='🔄 重新抓取地點和天氣'; };
+    navigator.geolocation.getCurrentPosition(async p=>{
+      lastRefresh=Date.now();
+      const lat=p.coords.latitude, lon=p.coords.longitude, coord=`${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      btn.textContent='抓取中…';
+      const [geo, wx] = await Promise.all([
+        getJSON(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`),
+        getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`)
+      ]);
+      const addr = geo && geo.address ? twAddress(geo.address) : '';
+      S.location = addr || coord;
+      lInfo.textContent = addr ? S.location : `${coord}（找不到門牌，先用座標）`;
+      if(wx && wx.current && typeof wx.current.temperature_2m==='number'){
+        const desc = WMO(wx.current.weather_code);
+        S.weather = `${desc ? desc+' ' : ''}${Math.round(wx.current.temperature_2m)}°C`;
+        wInfo.textContent = S.weather;
+      } else {
+        wInfo.textContent = S.weather ? `${S.weather}（暫時抓不到最新天氣，先用上次的）` : '抓不到天氣，請確認有網路';
+      }
+      save(); renderPreview(); done();
+    }, err=>{
+      lInfo.textContent = err && err.code===1
+        ? '定位權限被拒絕，請到「設定 → 隱私權與安全性 → 定位服務」開啟'
+        : '暫時無法定位，稍後會再試';
+      done();
+    }, {enableHighAccuracy:true, timeout:15000, maximumAge:60000});
+  }
+  if(S.location) $('locInfo').textContent = S.location;
+  if(S.weather) $('weatherInfo').textContent = S.weather;
+  $('refreshBtn').onclick = ()=>refreshAuto(true);
+  setInterval(()=>refreshAuto(false), 5*60*1000);
   $('wmToggle').addEventListener('change', e=>setEnabled(e.target.checked));
   $('ratioBtn').onclick = ()=>{
     S.ratio = S.ratio==='4:3' ? '16:9' : '4:3'; save();
@@ -752,7 +763,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   setInterval(renderPreview, 1000);
   setTimeout(()=>{ $('hint').style.opacity=0; }, 4000);
   startCamera();
-  if(S.autoLoc) setTimeout(()=>locate(true), 1500);
+  setTimeout(()=>refreshAuto(true), 1200);
 })();
 </script>
 </body>
