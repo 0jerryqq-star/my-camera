@@ -41,6 +41,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 #wm{position:absolute;left:0;top:0;cursor:grab;touch-action:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));z-index:2}
 #wm.dragging{cursor:grabbing;outline:2px dashed var(--safety);outline-offset:3px}
 #wm[hidden]{display:none}
+.sun{position:absolute;left:0;top:0;width:34px;z-index:2;opacity:0;pointer-events:none;transition:opacity .35s;touch-action:none;color:var(--safety);filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
+.sun.show{opacity:1;pointer-events:auto}
+.sun .ln{position:absolute;left:16px;width:2px;background:var(--safety);border-radius:1px}
+.sun .knob{position:absolute;left:3px;width:28px;height:28px;display:block}
+.sun .knob svg{width:28px;height:28px;display:block}
+.sun .pct{position:absolute;left:36px;font-size:12px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity .2s;text-shadow:0 1px 2px #000}
+.sun.dragging .pct{opacity:1}
+.sun.flip .pct{left:auto;right:36px}
 .flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:5}
 .flash.go{animation:flash .25s ease-out}
 @keyframes flash{0%{opacity:.85}100%{opacity:0}}
@@ -132,7 +140,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 <div class="viewport" id="viewport">
   <video id="video" playsinline muted autoplay></video>
   <img class="src" id="srcImg" alt="" hidden>
-  <canvas id="wm" aria-label="浮水印，可拖曳移動"></canvas>
+  <canvas id="wm" aria-label="浮水印：拖曳移動、兩指縮放、點一下調透明度"></canvas>
+  <div class="sun" id="sun" aria-hidden="true">
+    <span class="ln" id="lnA"></span>
+    <span class="knob" id="knob"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 3.5v3M14 21.5v3M3.5 14h3M21.5 14h3M6.6 6.6l2.1 2.1M19.3 19.3l2.1 2.1M6.6 21.4l2.1-2.1M19.3 8.7l2.1-2.1"/></g></svg></span>
+    <span class="ln" id="lnB"></span>
+    <span class="pct" id="pct"></span>
+  </div>
   <div class="flash" id="flash"></div>
 </div>
 
@@ -157,7 +171,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   <button class="thumb empty" id="thumb" aria-label="查看上一張照片"></button>
 </div>
 
-<div class="hint" id="hint">拖曳浮水印可以移動位置</div>
+<div class="hint" id="hint">浮水印：拖曳移動・兩指縮放・點一下調透明度</div>
 <div class="toast" id="toast" role="status"></div>
 
 <div class="fallback" id="fallback" hidden>
@@ -343,45 +357,138 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
     let x, y;
     if(S.pos){ x = S.pos.x*vw; y = S.pos.y*vh; } else ({x,y} = defaultPos(vw,vh));
+    setWM(x, y, false);
+  }
+  function setWM(x, y, store){
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
     x = Math.max(0, Math.min(x, vw-wmW)); y = Math.max(0, Math.min(y, vh-wmH));
     wm.style.transform = `translate(${x}px,${y}px)`;
     wm.dataset.x = x; wm.dataset.y = y;
+    if(store) S.pos = {x:x/vw, y:y/vh};
+    placeSun();
   }
   function setEnabled(on){
     S.enabled = on; save();
     wm.hidden = !on;
+    if(!on) $('sun').classList.remove('show');
     $('wmToggle').checked = on;
     $('wmLabel').textContent = on ? '浮水印 開' : '浮水印 關';
   }
 
-  let drag=null;
-  wm.addEventListener('pointerdown', e=>{
-    wm.setPointerCapture(e.pointerId);
-    drag = {id:e.pointerId, sx:e.clientX, sy:e.clientY, ox:+wm.dataset.x, oy:+wm.dataset.y};
+  // ---------- gestures on the card: 1 finger = move, 2 fingers = resize ----------
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const pts = new Map(); let g=null;
+  document.addEventListener('gesturestart', e=>e.preventDefault());   // stop Safari page zoom
+  function syncSliders(){
+    const sc=$('scale'), op=$('opacity');
+    if(sc){ sc.value=S.scale; $('scaleVal').textContent=Math.round(S.scale*100)+'%'; }
+    if(op){ op.value=S.opacity; $('opacityVal').textContent=Math.round(S.opacity*100)+'%'; }
+  }
+  function beginGesture(){
+    const list=[...pts.values()];
+    g = {n:list.length, x0:+wm.dataset.x, y0:+wm.dataset.y, s0:S.scale, moved:g?g.moved:false, t:Date.now()};
+    if(list.length===1){ g.p=list[0]; }
+    else {
+      const [a,b]=list;
+      g.d0 = Math.hypot(a.x-b.x, a.y-b.y) || 1;
+      g.m0 = {x:(a.x+b.x)/2, y:(a.y+b.y)/2};
+      g.c0 = {x:g.x0+wmW/2, y:g.y0+wmH/2};
+    }
+  }
+  viewport.addEventListener('pointerdown', e=>{
+    if(wm.hidden) return;
+    const onCard = e.target===wm;
+    if(!onCard && pts.size===0) return;       // gesture must start on the card
+    if(pts.size>=2) return;
+    e.preventDefault();
+    pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if(!g) g={moved:false};
+    beginGesture();
     wm.classList.add('dragging'); $('hint').style.opacity=0;
+    showSun();
   });
-  wm.addEventListener('pointermove', e=>{
-    if(!drag || e.pointerId!==drag.id) return;
-    const vw=viewport.clientWidth, vh=viewport.clientHeight;
-    const x = Math.max(0, Math.min(drag.ox + e.clientX-drag.sx, vw-wmW));
-    const y = Math.max(0, Math.min(drag.oy + e.clientY-drag.sy, vh-wmH));
-    wm.style.transform = `translate(${x}px,${y}px)`; wm.dataset.x=x; wm.dataset.y=y;
+  window.addEventListener('pointermove', e=>{
+    if(!pts.has(e.pointerId) || !g) return;
+    pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    const list=[...pts.values()];
+    if(g.n===1){
+      const dx=list[0].x-g.p.x, dy=list[0].y-g.p.y;
+      if(Math.abs(dx)+Math.abs(dy) > 6) g.moved=true;
+      setWM(g.x0+dx, g.y0+dy, true);
+    } else if(list.length>=2){
+      g.moved=true;
+      const [a,b]=list;
+      const d=Math.hypot(a.x-b.x, a.y-b.y);
+      const m={x:(a.x+b.x)/2, y:(a.y+b.y)/2};
+      S.scale = clamp(g.s0*d/g.d0, 0.4, 2.6);
+      renderPreview();
+      setWM(g.c0.x+(m.x-g.m0.x)-wmW/2, g.c0.y+(m.y-g.m0.y)-wmH/2, true);
+      syncSliders();
+    }
+    showSun();
   });
-  const endDrag = ()=>{
-    if(!drag) return; drag=null; wm.classList.remove('dragging');
-    S.pos = {x:+wm.dataset.x/viewport.clientWidth, y:+wm.dataset.y/viewport.clientHeight}; save();
+  const liftFinger = e=>{
+    if(!pts.has(e.pointerId)) return;
+    pts.delete(e.pointerId);
+    if(pts.size===0){
+      wm.classList.remove('dragging');
+      g=null; save();
+    } else beginGesture();          // one finger left: keep dragging smoothly
   };
-  wm.addEventListener('pointerup', endDrag); wm.addEventListener('pointercancel', endDrag);
+  window.addEventListener('pointerup', liftFinger);
+  window.addEventListener('pointercancel', liftFinger);
   wm.tabIndex = 0;
   wm.addEventListener('keydown', e=>{
     const d={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];
     if(!d) return; e.preventDefault();
-    const vw=viewport.clientWidth, vh=viewport.clientHeight;
-    S.pos = {x:(+wm.dataset.x+d[0])/vw, y:(+wm.dataset.y+d[1])/vh}; save(); placeWM();
+    setWM(+wm.dataset.x+d[0], +wm.dataset.y+d[1], true); save();
   });
 
+  // ---------- sun: drag up/down to change the card's opacity ----------
+  const sun=$('sun'); let sunTimer, sunDrag=null, sunT=120;
+  const OMIN=0.2, OMAX=1;
+  function placeSun(){
+    if(!sun) return;
+    const vw=viewport.clientWidth, vh=viewport.clientHeight;
+    const x=+wm.dataset.x, y=+wm.dataset.y;
+    sunT = Math.max(120, wmH);
+    const flip = x + wmW + 14 + 34 > vw;
+    const left = flip ? x - 14 - 34 : x + wmW + 14;
+    const top = clamp(y + wmH/2 - sunT/2, 4, vh - sunT - 4);
+    sun.style.transform = `translate(${left}px,${top}px)`;
+    sun.style.height = sunT+'px';
+    sun.classList.toggle('flip', flip);
+    const f = (S.opacity-OMIN)/(OMAX-OMIN);
+    const k = (1-f)*(sunT-28);
+    $('knob').style.top = k+'px';
+    $('lnA').style.top='0px'; $('lnA').style.height=Math.max(0,k-5)+'px';
+    $('lnB').style.top=(k+33)+'px'; $('lnB').style.height=Math.max(0,sunT-k-33)+'px';
+    $('pct').style.top=(k+6)+'px'; $('pct').textContent=Math.round(S.opacity*100)+'%';
+  }
+  function showSun(){
+    if(wm.hidden) return;
+    placeSun(); sun.classList.add('show');
+    clearTimeout(sunTimer);
+    sunTimer = setTimeout(()=>{ if(!sunDrag) sun.classList.remove('show'); }, 3000);
+  }
+  sun.addEventListener('pointerdown', e=>{
+    e.preventDefault(); e.stopPropagation();
+    sun.setPointerCapture(e.pointerId);
+    sunDrag={id:e.pointerId, y:e.clientY, o:S.opacity};
+    sun.classList.add('dragging'); showSun();
+  });
+  sun.addEventListener('pointermove', e=>{
+    if(!sunDrag || e.pointerId!==sunDrag.id) return;
+    S.opacity = clamp(sunDrag.o - (e.clientY-sunDrag.y)/(sunT-28)*(OMAX-OMIN), OMIN, OMAX);
+    renderPreview(); syncSliders(); showSun();
+  });
+  const endSun = e=>{
+    if(!sunDrag) return; sunDrag=null; sun.classList.remove('dragging'); save(); showSun();
+  };
+  sun.addEventListener('pointerup', endSun); sun.addEventListener('pointercancel', endSun);
+
   // ---------- camera ----------
-  let stream=null, facing='environment', source='none';
+  let stream=null, facing='environment', source='none', resumes=[];
   async function startCamera(){
     stopCamera();
     if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
@@ -394,7 +501,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       video.srcObject = stream; await video.play().catch(()=>{});
       // iOS: tapping the camera indicator and choosing "stop" ends the track
       stream.getVideoTracks().forEach(t=>t.addEventListener('ended', ()=>{
-        if(source==='video') showFallback('相機被暫停了（例如按了狀態列的停止）。點下面按鈕就能繼續拍。', true);
+        if(source!=='video') return;
+        const now=Date.now();
+        resumes = resumes.filter(ts=>now-ts<60000);
+        if(resumes.length < 3){
+          resumes.push(now);
+          toast('相機已自動重新開啟');
+          startCamera();
+        } else {
+          showFallback('相機被暫停了（例如按了狀態列的停止）。點下面按鈕就能繼續拍。', true);
+        }
       }));
       srcImg.hidden = true; video.hidden = false; source='video';
       $('fallback').hidden = true; $('shutter').disabled = false;
