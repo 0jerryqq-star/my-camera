@@ -118,7 +118,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .sheet .body{overflow-y:auto;padding:4px 18px 22px;-webkit-overflow-scrolling:touch}
 .row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--field-border)}
 .row:last-of-type{border-bottom:0}
-.row .lbl{font-size:14px;font-weight:500}
+.row .lbl{font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.handle{display:inline-flex;width:30px;height:30px;margin:-6px 0 -6px -6px;align-items:center;justify-content:center;color:var(--sheet-muted);cursor:grab;touch-action:none;border-radius:8px;user-select:none;-webkit-user-select:none}
+.handle svg{width:20px;height:20px}
+.sort-tip{margin:14px 0 0;font-size:12px;color:var(--sheet-muted)}
+#orderList{position:relative}
+#orderList > .row:last-child{border-bottom:1px solid var(--field-border)}
+.row.sortable{background:var(--sheet-bg);position:relative}
+.row.lifting{z-index:2;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:12px;border-bottom-color:transparent;transition:none}
+.row.lifting .handle{cursor:grabbing;color:var(--safety)}
+#orderList.sorting{user-select:none;-webkit-user-select:none}
 .row .show{font-size:13px;color:var(--sheet-muted);display:flex;align-items:center;gap:6px}
 .row .show input{width:18px;height:18px;accent-color:var(--safety)}
 .row .field{grid-column:1 / -1;display:flex;gap:8px}
@@ -229,34 +238,37 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     <div class="row">
       <span class="lbl">標題</span>
       <label class="show"><input type="checkbox" data-show="site" checked>顯示</label>
-      <div class="field"><input type="text" data-key="site" placeholder="例：OOOO工地"></div>
+      <div class="field"><input type="text" data-key="site" placeholder="例：工作紀錄"></div>
     </div>
-    <div class="row">
-      <span class="lbl">施工區域</span>
+    <p class="sort-tip">按住 ≡ 上下拖曳，可以調整浮水印的項目順序</p>
+    <div id="orderList">
+    <div class="row sortable" data-item="area">
+      <span class="lbl"><span class="handle" aria-label="按住拖曳調整順序"><svg viewBox="0 0 20 20"><path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>施工區域</span>
       <label class="show"><input type="checkbox" data-show="area" checked>顯示</label>
-      <div class="field"><input type="text" data-key="area" placeholder="例：大里港洲C"></div>
+      <div class="field"><input type="text" data-key="area" placeholder="例：大里港洲C棟"></div>
     </div>
-    <div class="row">
-      <span class="lbl">施工內容</span>
+    <div class="row sortable" data-item="content">
+      <span class="lbl"><span class="handle" aria-label="按住拖曳調整順序"><svg viewBox="0 0 20 20"><path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>施工內容</span>
       <label class="show"><input type="checkbox" data-show="content" checked>顯示</label>
       <div class="field"><input type="text" data-key="content" placeholder="例：工具箱會議安全宣導"></div>
     </div>
-    <div class="row">
-      <span class="lbl">拍攝時間</span>
+    <div class="row sortable" data-item="time">
+      <span class="lbl"><span class="handle" aria-label="按住拖曳調整順序"><svg viewBox="0 0 20 20"><path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>拍攝時間</span>
       <label class="show"><input type="checkbox" data-show="time" checked>顯示</label>
       <div class="auto">按下快門時自動記錄日期和時間</div>
     </div>
-    <div class="row">
-      <span class="lbl">天氣／溫度</span>
+    <div class="row sortable" data-item="weather">
+      <span class="lbl"><span class="handle" aria-label="按住拖曳調整順序"><svg viewBox="0 0 20 20"><path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>天氣／溫度</span>
       <label class="show"><input type="checkbox" data-show="weather" checked>顯示</label>
       <div class="field"><input type="text" data-key="weather" placeholder="自動抓取中…"><button type="button" class="small-btn" id="wxBtn">🔄 重新抓取</button></div>
       <div class="auto" id="weatherInfo"></div>
     </div>
-    <div class="row">
-      <span class="lbl">地點</span>
+    <div class="row sortable" data-item="location">
+      <span class="lbl"><span class="handle" aria-label="按住拖曳調整順序"><svg viewBox="0 0 20 20"><path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>地點</span>
       <label class="show"><input type="checkbox" data-show="location" checked>顯示</label>
       <div class="field"><input type="text" data-key="location" placeholder="自動定位中…"><button type="button" class="small-btn" id="locBtn">🔄 重新抓取</button></div>
       <div class="auto" id="locInfo"></div>
+    </div>
     </div>
     <div class="row">
       <span class="lbl">浮水印大小</span>
@@ -313,11 +325,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   const defaults = {
     site:'', area:'', content:'', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true},
-    ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
+    order:['area','content','time','weather','location'], ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
   if(S.site==='OOOO工地') S.site='';
+  { const all=defaults.order, o=(Array.isArray(S.order)?S.order:[]).filter(k=>all.includes(k));
+    S.order = o.concat(all.filter(k=>!o.includes(k))); }
   const save = () => store.set('sitecam:settings', S);
 
   const pad = n => String(n).padStart(2,'0');
@@ -355,11 +369,14 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       if(!S.show[k]) return;
       wrap(ctx, val||'', valW).forEach((t,i)=>rows.push({label: i===0 ? label : '', text:t}));
     };
-    add('area','施工區域',S.area.trim());
-    add('content','施工內容',S.content.trim());
-    add('time','拍攝時間',fmtDate(when)+' '+fmtTime(when));
-    add('weather','天氣',S.weather.trim());
-    add('location','地點',S.location.trim());
+    const ITEMS = {
+      area:    ['施工區域', ()=>S.area.trim()],
+      content: ['施工內容', ()=>S.content.trim()],
+      time:    ['拍攝時間', ()=>fmtDate(when)+' '+fmtTime(when)],
+      weather: ['天氣',     ()=>S.weather.trim()],
+      location:['地點',     ()=>S.location.trim()]
+    };
+    S.order.forEach(k=>{ if(ITEMS[k]) add(k, ITEMS[k][0], ITEMS[k][1]()); });
     const LH = 21*s;
     const bodyH = rows.length ? rows.length*LH + 14*s : 0;
     return {W, P, head, headLH, headH, rows, LH, bodyH, labelW, colonW, H: Math.max(headH+bodyH, 1), r: 6*s, s};
@@ -814,6 +831,49 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   $('locBtn').onclick = ()=>refreshField('location');
   setInterval(()=>refreshAuto(false), 5*60*1000);
   $('wmToggle').addEventListener('change', e=>setEnabled(e.target.checked));
+
+  // ---------- reorder watermark items in settings ----------
+  const list=$('orderList'), sheetBody=document.querySelector('.sheet .body');
+  S.order.forEach(k=>{ const r=list.querySelector(`[data-item=${k}]`); if(r) list.appendChild(r); });
+  let sd=null;
+  list.addEventListener('pointerdown', e=>{
+    const h=e.target.closest('.handle'); if(!h) return;
+    e.preventDefault();
+    const row=h.closest('.row');
+    h.setPointerCapture(e.pointerId);
+    sd={row, handle:h, id:e.pointerId, y0:e.clientY, sc0:sheetBody.scrollTop, lastY:e.clientY};
+    row.classList.add('lifting'); list.classList.add('sorting');
+  });
+  function sortMove(clientY){
+    const {row}=sd;
+    const dy = clientY - sd.y0 + (sheetBody.scrollTop - sd.sc0);
+    row.style.transform=`translateY(${dy}px)`;
+    const prev=row.previousElementSibling, next=row.nextElementSibling;
+    if(prev && dy < -prev.offsetHeight/2){
+      list.insertBefore(row, prev); sd.y0 -= prev.offsetHeight; sortMove(clientY);
+    } else if(next && dy > next.offsetHeight/2){
+      list.insertBefore(next, row); sd.y0 += next.offsetHeight; sortMove(clientY);
+    }
+  }
+  list.addEventListener('pointermove', e=>{
+    if(!sd || e.pointerId!==sd.id) return;
+    sd.lastY=e.clientY; sortMove(e.clientY);
+  });
+  // scroll the sheet when dragging near its top or bottom edge
+  setInterval(()=>{
+    if(!sd) return;
+    const b=sheetBody.getBoundingClientRect(), edge=48;
+    let v=0;
+    if(sd.lastY < b.top+edge) v=-8; else if(sd.lastY > b.bottom-edge) v=8;
+    if(v){ const before=sheetBody.scrollTop; sheetBody.scrollTop+=v; if(sheetBody.scrollTop!==before) sortMove(sd.lastY); }
+  }, 16);
+  const sortEnd=e=>{
+    if(!sd || e.pointerId!==sd.id) return;
+    sd.row.style.transform=''; sd.row.classList.remove('lifting'); list.classList.remove('sorting');
+    sd=null;
+    S.order=[...list.children].map(r=>r.dataset.item); save(); renderPreview();
+  };
+  list.addEventListener('pointerup', sortEnd); list.addEventListener('pointercancel', sortEnd);
   $('ratioBtn').onclick = ()=>{
     S.ratio = S.ratio==='4:3' ? '16:9' : '4:3'; save();
     layoutFrame(); renderPreview();
