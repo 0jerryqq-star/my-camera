@@ -346,13 +346,18 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
   };
   const defaults = {
-    site:'', area:'', content:'', weather:'', location:'',
+    site:'工作紀錄', area:'大里港洲C棟', content:'工具箱會議安全宣導', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true},
     order:['area','content','time','weather','location'], theme:'yellow', ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
   if(S.site==='OOOO工地') S.site='';
+  // one-time: people who opened an older version get the new defaults in empty fields
+  if(!(S.v>=2)){
+    ['site','area','content'].forEach(k=>{ if(!String(S[k]||'').trim()) S[k]=defaults[k]; });
+    S.v=2; store.set('sitecam:settings', S);
+  }
   { const all=defaults.order, o=(Array.isArray(S.order)?S.order:[]).filter(k=>all.includes(k));
     S.order = o.concat(all.filter(k=>!o.includes(k))); }
   const save = () => store.set('sitecam:settings', S);
