@@ -110,6 +110,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .row .field{grid-column:1 / -1;display:flex;gap:8px}
 .row input[type=text]{flex:1;min-width:0;background:var(--field-bg);border:1px solid var(--field-border);color:var(--sheet-text);border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit}
 .row .auto{grid-column:1 / -1;font-size:14px;color:var(--sheet-muted)}
+.row .auto:empty{display:none}
+.row .opt{grid-column:1 / -1;font-size:14px}
 .chips{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px}
 .chips button{background:var(--field-bg);border:1px solid var(--field-border);color:var(--sheet-text);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
 .small-btn{background:var(--field-bg);border:1px solid var(--field-border);color:var(--sheet-text);border-radius:10px;padding:0 12px;font-size:14px;cursor:pointer;white-space:nowrap}
@@ -206,11 +208,18 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       <span class="lbl">地點</span>
       <label class="show"><input type="checkbox" data-show="location" checked>顯示</label>
       <div class="field"><input type="text" data-key="location" placeholder="例：台北市信義區"><button type="button" class="small-btn" id="gpsBtn">📍 定位</button></div>
+      <label class="show opt"><input type="checkbox" id="autoLoc">每次打開自動找最近的門牌</label>
+      <div class="auto" id="locInfo"></div>
     </div>
     <div class="row">
       <span class="lbl">浮水印大小</span>
       <span class="show" id="scaleVal">100%</span>
       <input type="range" id="scale" min="0.6" max="1.8" step="0.05" value="1">
+    </div>
+    <div class="row">
+      <span class="lbl">浮水印透明度</span>
+      <span class="show" id="opacityVal">100%</span>
+      <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="1" aria-label="浮水印不透明度">
     </div>
     <p class="note">設定會記在這台裝置上，下次打開會自動帶入。</p>
   </div>
@@ -250,7 +259,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   const defaults = {
     site:'OOOO工地', area:'', content:'', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true},
-    scale:1, enabled:true, pos:null
+    scale:1, opacity:1, autoLoc:true, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
@@ -298,6 +307,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     const {W,P,head,headLH,headH,rows,LH,bodyH,H,r,s} = L;
     if(!head.length && !rows.length) return;
     ctx.save();
+    ctx.globalAlpha = S.opacity;
     ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0,0,W,H,r) : ctx.rect(0,0,W,H); ctx.clip();
     if(headH){ ctx.fillStyle = '#F5B800'; ctx.fillRect(0,0,W,headH); }
     if(bodyH){ ctx.fillStyle = 'rgba(18,18,18,0.66)'; ctx.fillRect(0,headH,W,bodyH); }
@@ -382,6 +392,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
         video:{facingMode:{ideal:facing}, width:{ideal:3840}, height:{ideal:2160}}, audio:false
       });
       video.srcObject = stream; await video.play().catch(()=>{});
+      // iOS: tapping the camera indicator and choosing "stop" ends the track
+      stream.getVideoTracks().forEach(t=>t.addEventListener('ended', ()=>{
+        if(source==='video') showFallback('相機被暫停了（例如按了狀態列的停止）。點下面按鈕就能繼續拍。', true);
+      }));
       srcImg.hidden = true; video.hidden = false; source='video';
       $('fallback').hidden = true; $('shutter').disabled = false;
     }catch(err){
@@ -391,10 +405,15 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     }
   }
   function stopCamera(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
-  function showFallback(msg){
-    source='none'; video.hidden = true;
+  function showFallback(msg, resumeFirst){
+    source='none'; video.hidden = true; stopCamera();
     $('fallbackMsg').textContent = msg; $('fallback').hidden = false;
-    $('retryCam').hidden = !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    const canLive = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    $('retryCam').hidden = !canLive;
+    $('retryCam').textContent = resumeFirst ? '繼續使用相機' : '重新嘗試即時相機';
+    $('retryCam').className = resumeFirst ? 'big-btn' : 'ghost-btn';
+    $('fallback').prepend($('fallbackMsg'));
+    if(resumeFirst) $('fallbackMsg').after($('retryCam')); else $('fallback').append($('retryCam'));
     $('shutter').disabled = true;
   }
   $('retryCam').onclick = startCamera;
@@ -417,6 +436,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   window.addEventListener('orientationchange', onRotate);
   document.addEventListener('visibilitychange', ()=>{
     if(document.visibilityState==='visible' && source==='video' && (!stream || !stream.active)) startCamera();
+    if(document.visibilityState==='visible' && S.autoLoc) locate(true);
   });
 
   function onFile(e){
@@ -527,15 +547,52 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   const scale=$('scale');
   scale.value=S.scale; $('scaleVal').textContent=Math.round(S.scale*100)+'%';
   scale.addEventListener('input', ()=>{ S.scale=+scale.value; $('scaleVal').textContent=Math.round(S.scale*100)+'%'; save(); renderPreview(); });
-  $('gpsBtn').onclick = ()=>{
-    const inp=document.querySelector('[data-key=location]');
-    if(!navigator.geolocation){ inp.placeholder='此裝置無法定位，請手動輸入'; return; }
-    $('gpsBtn').textContent='定位中…';
-    navigator.geolocation.getCurrentPosition(p=>{
-      inp.value = `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`;
-      S.location=inp.value; save(); renderPreview(); $('gpsBtn').textContent='📍 定位';
-    }, ()=>{ inp.placeholder='無法取得定位，請手動輸入'; $('gpsBtn').textContent='📍 定位'; }, {enableHighAccuracy:true, timeout:10000});
-  };
+  const op=$('opacity');
+  op.value=S.opacity; $('opacityVal').textContent=Math.round(S.opacity*100)+'%';
+  op.addEventListener('input', ()=>{ S.opacity=+op.value; $('opacityVal').textContent=Math.round(S.opacity*100)+'%'; save(); renderPreview(); });
+  // Find coordinates, then the nearest street address (OpenStreetMap reverse geocoding)
+  function twAddress(a){
+    const city = a.city || a.county || a.state || '';
+    const dist = a.city_district || a.district || a.suburb || a.town || a.township || '';
+    const road = a.road || a.pedestrian || a.footway || a.neighbourhood || a.village || a.hamlet || '';
+    let no = a.house_number || '';
+    if(no && !/號$/.test(no)) no += '號';
+    return (city + (dist!==city?dist:'') + road + no) || '';
+  }
+  let locating=false, lastAuto=0;
+  function locate(auto){
+    const inp=document.querySelector('[data-key=location]'), info=$('locInfo'), btn=$('gpsBtn');
+    if(locating) return;
+    if(auto && Date.now()-lastAuto < 60000) return;
+    if(auto) lastAuto = Date.now();
+    if(!navigator.geolocation){ info.textContent='這台裝置無法定位，請手動輸入'; return; }
+    locating=true; btn.textContent='定位中…'; info.textContent='';
+    const done = ()=>{ locating=false; btn.textContent='📍 定位'; };
+    navigator.geolocation.getCurrentPosition(async p=>{
+      const lat=p.coords.latitude, lon=p.coords.longitude, coord=`${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      const acc=Math.round(p.coords.accuracy);
+      btn.textContent='找門牌…';
+      let addr='';
+      try{
+        const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
+        const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`,{signal:ctrl.signal});
+        clearTimeout(t);
+        if(r.ok){ const j=await r.json(); addr = j.address ? twAddress(j.address) : ''; }
+      }catch(e){}
+      inp.value = addr || coord;
+      S.location = inp.value; save(); renderPreview();
+      info.textContent = addr
+        ? `座標 ${coord}（誤差約 ${acc} 公尺）。門牌不準可以直接修改。`
+        : `座標 ${coord}。找不到附近門牌（可能沒有網路），已先填入座標。`;
+      done();
+    }, err=>{
+      info.textContent = err && err.code===1 ? '定位權限被拒絕，可到「設定 → 隱私權 → 定位服務」開啟' : '無法取得定位，請手動輸入';
+      done();
+    }, {enableHighAccuracy:true, timeout:15000, maximumAge:30000});
+  }
+  $('gpsBtn').onclick = ()=>locate(false);
+  const autoLoc=$('autoLoc'); autoLoc.checked=!!S.autoLoc;
+  autoLoc.addEventListener('change', ()=>{ S.autoLoc=autoLoc.checked; save(); if(S.autoLoc) locate(false); });
   $('wmToggle').addEventListener('change', e=>setEnabled(e.target.checked));
 
   // ---------- boot ----------
@@ -547,6 +604,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   setInterval(renderPreview, 1000);
   setTimeout(()=>{ $('hint').style.opacity=0; }, 4000);
   startCamera();
+  if(S.autoLoc) setTimeout(()=>locate(true), 1500);
 })();
 </script>
 </body>
