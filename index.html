@@ -122,7 +122,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .sort-tip{margin:14px 0 0;font-size:12px;color:var(--sheet-muted)}
 #orderList{position:relative}
 .row .opt{grid-column:1 / -1;font-size:14px;color:var(--sheet-text)}
-.row.custom .field input.c-label{flex:0 0 36%}
+.row.custom .lbl{min-width:0}
+.row.custom input.c-label{font:inherit;font-size:14px;font-weight:500;color:var(--sheet-text);background:transparent;border:0;border-bottom:1.5px dashed var(--field-border);border-radius:0;padding:2px 2px 3px;width:9em;min-width:0}
+.row.custom input.c-label:focus{outline:none;border-bottom-color:var(--safety)}
 .row .tools{display:flex;align-items:center;gap:12px}
 .del-btn{background:none;border:0;color:var(--sheet-muted);font-size:13px;cursor:pointer;padding:4px 2px;font-family:inherit}
 .add-item{margin:12px 0 4px;width:100%;padding:12px;border-radius:12px;border:1.5px dashed var(--field-border);background:transparent;color:var(--sheet-text);font-size:15px;cursor:pointer;font-family:inherit}
@@ -354,7 +356,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   const defaults = {
     site:'工作紀錄', area:'大里港洲C棟', content:'工具箱會議安全宣導', weather:'', location:'',
     show:{site:true,area:true,content:true,time:true,weather:true,location:true,coords:true},
-    order:['area','content','time','weather','location','c1'], custom:[{id:'c1',label:'',value:'',show:true}], coords:'', theme:'yellow', ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
+    order:['area','content','time','weather','location','c1'], custom:[{id:'c1',label:'自訂項目',value:'',show:true}], coords:'', theme:'yellow', ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
@@ -365,12 +367,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     S.v=2; store.set('sitecam:settings', S);
   }
   if(!(S.v>=3)){                      // add one blank custom item right after 地點
-    if(!Array.isArray(S.custom) || !S.custom.length) S.custom=[{id:'c1',label:'',value:'',show:true}];
+    if(!Array.isArray(S.custom) || !S.custom.length) S.custom=[{id:'c1',label:'自訂項目',value:'',show:true}];
     const o=Array.isArray(S.order)?S.order.slice():[];
     if(!o.includes('c1')){ const i=o.indexOf('location'); o.splice(i<0?o.length:i+1, 0, 'c1'); }
     S.order=o; S.v=3; store.set('sitecam:settings', S);
   }
   if(!Array.isArray(S.custom)) S.custom=[];
+  S.custom.forEach(c=>{ if(!String(c.label||'').trim() && !String(c.value||'').trim()) c.label='自訂項目'; });
   { const base=['area','content','time','weather','location'];
     const all=base.concat(S.custom.map(c=>c.id));
     const o=(Array.isArray(S.order)?S.order:[]).filter((k,i,a)=>all.includes(k) && a.indexOf(k)===i);
@@ -404,7 +407,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     const head = (S.show.site && site) ? wrap(ctx, site, inner) : [];
     const headLH = 20*s, headH = head.length ? head.length*headLH + 14*s : 0;
     ctx.font = `400 ${14*s}px ${FONT}`;
-    const customOn = S.custom.filter(c=>c.show && (c.label.trim()||c.value.trim()));
+    const customOn = S.custom.filter(c=>c.show && c.value.trim());
     const labelW = Math.max(ctx.measureText('施工區域').width,   // every label spreads to this width
       ...customOn.map(c=>ctx.measureText(c.label.trim()).width));
     const colonW = ctx.measureText('：').width;
@@ -908,9 +911,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   function customRow(c){
     const row=document.createElement('div');
     row.className='row sortable custom'; row.dataset.item=c.id;
-    row.innerHTML = `<span class="lbl">${HANDLE_SVG}自訂項目</span>
+    row.innerHTML = `<span class="lbl">${HANDLE_SVG}<input type="text" class="c-label" maxlength="8" placeholder="自訂項目" aria-label="項目名稱（可修改）"></span>
       <span class="tools"><label class="show"><input type="checkbox">顯示</label><button type="button" class="del-btn">刪除</button></span>
-      <div class="field"><input type="text" class="c-label" maxlength="8" placeholder="項目名稱" aria-label="項目名稱"><input type="text" class="c-value" placeholder="內容" aria-label="內容"></div>`;
+      <div class="field"><input type="text" class="c-value" placeholder="輸入內容" aria-label="內容"></div>`;
     const [lab,val]=row.querySelectorAll('input[type=text]'), cb=row.querySelector('input[type=checkbox]');
     lab.value=c.label; val.value=c.value; cb.checked=c.show;
     lab.addEventListener('input', ()=>{ c.label=lab.value; save(); renderPreview(); });
@@ -928,11 +931,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   $('addItem').onclick=()=>{
     if(S.custom.length>=MAX_CUSTOM) return;
     let n=1; while(S.custom.some(c=>c.id==='c'+n)) n++;
-    const c={id:'c'+n, label:'', value:'', show:true};
+    const c={id:'c'+n, label:'自訂項目', value:'', show:true};
     S.custom.push(c); S.order.push(c.id);
     const row=customRow(c); list.appendChild(row);
     save(); syncAdd();
-    row.scrollIntoView({block:'nearest'}); row.querySelector('.c-label').focus();
+    row.scrollIntoView({block:'nearest'}); const li=row.querySelector('.c-label'); li.focus(); li.select();
   };
   syncAdd();
   let sd=null;
