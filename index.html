@@ -121,6 +121,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 .handle svg{width:20px;height:20px}
 .sort-tip{margin:14px 0 0;font-size:12px;color:var(--sheet-muted)}
 #orderList{position:relative}
+.row .opt{grid-column:1 / -1;font-size:14px;color:var(--sheet-text)}
+.row.custom .field input.c-label{flex:0 0 36%}
+.row .tools{display:flex;align-items:center;gap:12px}
+.del-btn{background:none;border:0;color:var(--sheet-muted);font-size:13px;cursor:pointer;padding:4px 2px;font-family:inherit}
+.add-item{margin:12px 0 4px;width:100%;padding:12px;border-radius:12px;border:1.5px dashed var(--field-border);background:transparent;color:var(--sheet-text);font-size:15px;cursor:pointer;font-family:inherit}
+.add-item:disabled{opacity:.4}
 #orderList > .row:last-child{border-bottom:1px solid var(--field-border)}
 .row.sortable{background:var(--sheet-bg);position:relative}
 .row.lifting{z-index:2;box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:12px;border-bottom-color:transparent;transition:none}
@@ -274,8 +280,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       <label class="show"><input type="checkbox" data-show="location" checked>顯示</label>
       <div class="field"><input type="text" data-key="location" placeholder="自動定位中…"><button type="button" class="small-btn" id="locBtn">🔄 重新抓取</button></div>
       <div class="auto" id="locInfo"></div>
+      <label class="show opt"><input type="checkbox" data-show="coords" checked>地點下一行顯示 GPS 座標</label>
     </div>
     </div>
+    <button type="button" class="add-item" id="addItem">＋ 新增項目</button>
     <div class="row">
       <span class="lbl">浮水印大小</span>
       <span class="show" id="scaleVal">100%</span>
@@ -345,8 +353,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
   };
   const defaults = {
     site:'工作紀錄', area:'大里港洲C棟', content:'工具箱會議安全宣導', weather:'', location:'',
-    show:{site:true,area:true,content:true,time:true,weather:true,location:true},
-    order:['area','content','time','weather','location'], theme:'yellow', ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
+    show:{site:true,area:true,content:true,time:true,weather:true,location:true,coords:true},
+    order:['area','content','time','weather','location','c1'], custom:[{id:'c1',label:'',value:'',show:true}], coords:'', theme:'yellow', ratio:'4:3', scale:1, opacity:1, enabled:true, pos:null
   };
   const S = Object.assign({}, defaults, store.get('sitecam:settings', {}));
   S.show = Object.assign({}, defaults.show, S.show||{});
@@ -356,7 +364,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     ['site','area','content'].forEach(k=>{ if(!String(S[k]||'').trim()) S[k]=defaults[k]; });
     S.v=2; store.set('sitecam:settings', S);
   }
-  { const all=defaults.order, o=(Array.isArray(S.order)?S.order:[]).filter(k=>all.includes(k));
+  if(!(S.v>=3)){                      // add one blank custom item right after 地點
+    if(!Array.isArray(S.custom) || !S.custom.length) S.custom=[{id:'c1',label:'',value:'',show:true}];
+    const o=Array.isArray(S.order)?S.order.slice():[];
+    if(!o.includes('c1')){ const i=o.indexOf('location'); o.splice(i<0?o.length:i+1, 0, 'c1'); }
+    S.order=o; S.v=3; store.set('sitecam:settings', S);
+  }
+  if(!Array.isArray(S.custom)) S.custom=[];
+  { const base=['area','content','time','weather','location'];
+    const all=base.concat(S.custom.map(c=>c.id));
+    const o=(Array.isArray(S.order)?S.order:[]).filter((k,i,a)=>all.includes(k) && a.indexOf(k)===i);
     S.order = o.concat(all.filter(k=>!o.includes(k))); }
   const save = () => store.set('sitecam:settings', S);
 
@@ -387,7 +404,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     const head = (S.show.site && site) ? wrap(ctx, site, inner) : [];
     const headLH = 20*s, headH = head.length ? head.length*headLH + 14*s : 0;
     ctx.font = `400 ${14*s}px ${FONT}`;
-    const labelW = ctx.measureText('施工區域').width;     // every label spreads to this width
+    const customOn = S.custom.filter(c=>c.show && (c.label.trim()||c.value.trim()));
+    const labelW = Math.max(ctx.measureText('施工區域').width,   // every label spreads to this width
+      ...customOn.map(c=>ctx.measureText(c.label.trim()).width));
     const colonW = ctx.measureText('：').width;
     const valW = inner - labelW - colonW;
     const rows = [];                                     // one entry per text line
@@ -402,7 +421,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
       weather: ['天氣',     ()=>S.weather.trim()],
       location:['地點',     ()=>S.location.trim()]
     };
-    S.order.forEach(k=>{ if(ITEMS[k]) add(k, ITEMS[k][0], ITEMS[k][1]()); });
+    S.order.forEach(k=>{
+      if(ITEMS[k]){
+        add(k, ITEMS[k][0], ITEMS[k][1]());
+        if(k==='location' && S.show.location && S.show.coords && S.coords && S.coords!==S.location.trim())
+          wrap(ctx, 'GPS '+S.coords, valW).forEach(t=>rows.push({label:'', text:t}));
+      } else {
+        const c = customOn.find(c=>c.id===k);
+        if(c) wrap(ctx, c.value.trim(), valW).forEach((t,i)=>rows.push({label: i===0 ? c.label.trim() : '', text:t, colon: i===0 && !!c.label.trim()}));
+      }
+    });
     const LH = 21*s;
     const bodyH = rows.length ? rows.length*LH + 14*s : 0;
     return {W, P, head, headLH, headH, rows, LH, bodyH, labelW, colonW, H: Math.max(headH+bodyH, 1), r: 6*s, s};
@@ -833,6 +861,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     try{
       const c = await getPos();
       const lat=c.latitude, lon=c.longitude, coord=`${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      S.coords = coord;
       if(k==='location'){
         const geo = await getJSON(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`);
         const addr = geo && geo.address ? twAddress(geo.address) : '';
@@ -858,7 +887,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
     if(!manual.weather) refreshField('weather');
   }
   ['weather','location'].forEach(k=>{
-    document.querySelector(`[data-key=${k}]`).addEventListener('input', ()=>{ manual[k]=true; });
+    document.querySelector(`[data-key=${k}]`).addEventListener('input', ()=>{ manual[k]=true; $(k==='weather'?'weatherInfo':'locInfo').textContent=''; });
   });
   $('wxBtn').onclick = ()=>refreshField('weather');
   $('locBtn').onclick = ()=>refreshField('location');
@@ -874,7 +903,38 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--safety);outline
 
   // ---------- reorder watermark items in settings ----------
   const list=$('orderList'), sheetBody=document.querySelector('.sheet .body');
-  S.order.forEach(k=>{ const r=list.querySelector(`[data-item=${k}]`); if(r) list.appendChild(r); });
+  const MAX_CUSTOM = 8;
+  const HANDLE_SVG = document.querySelector('.handle').outerHTML;
+  function customRow(c){
+    const row=document.createElement('div');
+    row.className='row sortable custom'; row.dataset.item=c.id;
+    row.innerHTML = `<span class="lbl">${HANDLE_SVG}自訂項目</span>
+      <span class="tools"><label class="show"><input type="checkbox">顯示</label><button type="button" class="del-btn">刪除</button></span>
+      <div class="field"><input type="text" class="c-label" maxlength="8" placeholder="項目名稱" aria-label="項目名稱"><input type="text" class="c-value" placeholder="內容" aria-label="內容"></div>`;
+    const [lab,val]=row.querySelectorAll('input[type=text]'), cb=row.querySelector('input[type=checkbox]');
+    lab.value=c.label; val.value=c.value; cb.checked=c.show;
+    lab.addEventListener('input', ()=>{ c.label=lab.value; save(); renderPreview(); });
+    val.addEventListener('input', ()=>{ c.value=val.value; save(); renderPreview(); });
+    cb.addEventListener('change', ()=>{ c.show=cb.checked; save(); renderPreview(); });
+    row.querySelector('.del-btn').addEventListener('click', ()=>{
+      S.custom=S.custom.filter(x=>x!==c); S.order=S.order.filter(k=>k!==c.id);
+      row.remove(); save(); renderPreview(); syncAdd();
+    });
+    return row;
+  }
+  function syncAdd(){ $('addItem').disabled = S.custom.length>=MAX_CUSTOM; }
+  S.custom.forEach(c=>list.appendChild(customRow(c)));
+  S.order.forEach(k=>{ const r=list.querySelector(`[data-item="${k}"]`); if(r) list.appendChild(r); });
+  $('addItem').onclick=()=>{
+    if(S.custom.length>=MAX_CUSTOM) return;
+    let n=1; while(S.custom.some(c=>c.id==='c'+n)) n++;
+    const c={id:'c'+n, label:'', value:'', show:true};
+    S.custom.push(c); S.order.push(c.id);
+    const row=customRow(c); list.appendChild(row);
+    save(); syncAdd();
+    row.scrollIntoView({block:'nearest'}); row.querySelector('.c-label').focus();
+  };
+  syncAdd();
   let sd=null;
   list.addEventListener('pointerdown', e=>{
     const h=e.target.closest('.handle'); if(!h) return;
